@@ -130,18 +130,8 @@ namespace SudokuSolver
 		//Checks whether the value at the given index is valid for the sudoku
 		public bool IsValid(int value, Index i)
 		{
-			//Check row
-			foreach (Cell c in GetCellsInRow(i))
-				if (c.Number == value)
-					return false;
-
-			//Check Column
-			foreach (Cell c in GetCellsInColumn(i))
-				if (c.Number == value)
-					return false;
-
-			//Check Box
-			foreach (Cell c in GetCellsInBox(i))
+			//Check connected cells
+			foreach (Cell c in GetConnectedCells(i))
 				if (c.Number == value)
 					return false;
 

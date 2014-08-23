@@ -50,7 +50,7 @@ namespace SudokuSolver
 
 			foreach (Cell c in this.Cells)
 			{
-				//If the Cell is empty and only has one possible candidate --> set
+				//If the Cell is empty and has only one possible candidate --> set
 				if (c.Number == 0 && c.Candidates.Count == 1)
 					NewNumberCalculated(c, c.Candidates[0], ref successful);	
 			}
@@ -228,7 +228,6 @@ namespace SudokuSolver
 
 
 
-		private enum FishTypes { }
 
 
 		//Do what is neccessary when a new Cell number got found out
@@ -293,7 +292,7 @@ namespace SudokuSolver
 		{
 			var temp = new List<List<Cell>>();
 			for (int r = 0; r <= 8; r++)
-				temp.Add(GetCellsInRow(new Index(r, 0)));	//i doesn't matter
+				temp.Add(GetCellsInRow(new Index(r, 0)));	//column doesn't matter
 			return temp;
 		}
 
@@ -301,7 +300,7 @@ namespace SudokuSolver
 		{
 			var temp = new List<List<Cell>>();
 			for (int c = 0; c <= 8; c++)
-				temp.Add(GetCellsInColumn(new Index(0, c)));	//j doesn't matter
+				temp.Add(GetCellsInColumn(new Index(0, c)));	//row doesn't matter
 			return temp;
 		}
 
