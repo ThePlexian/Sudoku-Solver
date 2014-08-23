@@ -1,0 +1,12 @@
+C:\Users\Marek\AppData\Local\Temporary Projects\Sudoku Solver\obj\Debug\Sudoku Solver.csprojResolveAssemblyReference.cache
+C:\Users\Marek\AppData\Local\Temporary Projects\Sudoku Solver\obj\Debug\Sudoku_Solver.Form1.resources
+C:\Users\Marek\AppData\Local\Temporary Projects\Sudoku Solver\obj\Debug\Sudoku_Solver.Properties.Resources.resources
+C:\Users\Marek\AppData\Local\Temporary Projects\Sudoku Solver\obj\Debug\Sudoku Solver.csproj.GenerateResource.Cache
+C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\bin\Debug\Sudoku Solver.exe
+C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\bin\Debug\Sudoku Solver.pdb
+C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Debug\Sudoku Solver.csproj.GenerateResource.Cache
+C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Debug\Sudoku Solver.exe
+C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Debug\Sudoku Solver.pdb
+C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Debug\Sudoku Solver.csprojResolveAssemblyReference.cache
+C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Debug\SudokuSolver.Properties.Resources.resources
+C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Debug\SudokuSolver.frmMain.resources
