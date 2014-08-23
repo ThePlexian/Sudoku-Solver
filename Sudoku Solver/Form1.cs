@@ -38,6 +38,9 @@ namespace SudokuSolver
 
 			this.sudokuField1.HoverActivated = true;
 			this.sudokuField1.ShowCandidates = false;
+
+			Version v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+			this.Text += "vers. " + v.Major.ToString() + "." + v.Minor.ToString();
 		}
 
 		private void Form1_Shown(object sender, EventArgs e)

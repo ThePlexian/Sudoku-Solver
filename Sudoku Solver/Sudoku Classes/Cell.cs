@@ -70,7 +70,6 @@ namespace SudokuSolver
 		//Compare
 		public bool IsEqual(Cell c)
 		{
-			bool t = HaveSameCandidates(this, c);
 			return (this.Number == c.Number && HaveSameCandidates(this, c) && this.IsPreset == c.IsPreset && this.Index.IsEqual(c.Index));
 		}
 
