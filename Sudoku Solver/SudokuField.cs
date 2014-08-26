@@ -309,16 +309,15 @@ namespace SudokuSolver
 		
 
 		//Keyboard interactoons
-		protected override void OnKeyDown(KeyEventArgs e)
+		protected override void OnKeyPress(KeyPressEventArgs e)
 		{
-			base.OnKeyDown(e);
-
+			base.OnKeyPress(e);
 			if (!SelectedCell.IsEqual(Cell.Empty()))
 			{
 				Index i = SelectedCell.Index;
 
 				//Check whether a number is pressed
-				string PressedKey = ((char)e.KeyValue).ToString();
+				string PressedKey = e.KeyChar.ToString();
 				int number;
 				if (int.TryParse(PressedKey, out number))
 				{
@@ -331,38 +330,38 @@ namespace SudokuSolver
 						if (this.Sudoku.SetValue(i, number))
 							this.Sudoku.SetPresetValue(i, true);
 					}
-
 				}
-				else //No number, but perhaps Arrowkeys or Tab etc.
-				{
-					Rectangle lastr = GetRectangle(SelectedCell);
-					switch (e.KeyData)
-					{
-						case Keys.Up:	//One step up
-							ChangeIndex(ref SelectedCell, Direction.Up);
-							break;
-						case Keys.Down: //One step down
-							ChangeIndex(ref SelectedCell, Direction.Down);
-							break;
-						case Keys.Left:	//One step left
-							ChangeIndex(ref SelectedCell, Direction.Left);
-							break;
-						case Keys.Tab:
-							ChangeIndex(ref SelectedCell, Direction.TabRight);
-							break;
-						case Keys.Right:	//One step right
-							ChangeIndex(ref SelectedCell, Direction.Right);
-							break;
-						case Keys.Delete: //Delete the number
-							this.Sudoku.ResetCell(i);
-							break;
-					}
+			}
+		}
 
-				}
+		protected override void OnKeyDown(KeyEventArgs e)
+		{
+			base.OnKeyDown(e);
 
+			//No number, but perhaps Arrowkeys or Tab etc.
+			Rectangle lastr = GetRectangle(SelectedCell);
+			Index i = SelectedCell.Index;
 
-
-								
+			switch (e.KeyData)
+			{
+				case Keys.Up:	//One step up
+					ChangeIndex(ref SelectedCell, Direction.Up);
+					break;
+				case Keys.Down: //One step down
+					ChangeIndex(ref SelectedCell, Direction.Down);
+					break;
+				case Keys.Left:	//One step left
+					ChangeIndex(ref SelectedCell, Direction.Left);
+					break;
+				case Keys.Tab:
+					ChangeIndex(ref SelectedCell, Direction.TabRight);
+					break;
+				case Keys.Right:	//One step right
+					ChangeIndex(ref SelectedCell, Direction.Right);
+					break;
+				case Keys.Delete: //Delete the number
+					this.Sudoku.ResetCell(i);
+					break;
 			}
 		}
 
@@ -386,37 +385,37 @@ namespace SudokuSolver
 			switch (d)
 			{
 				case Direction.Up:
-					c = Extensions.SetInRange(lastindex.Column - 1, 0, 8, out summand);
-					r = lastindex.Row - summand;
-					if (r >= 0)
-						newindex = new Index(r, c);
-					break;
-
-				case Direction.Down:
-					c = Extensions.SetInRange(lastindex.Column + 1, 0, 8, out summand);
-					r = lastindex.Row + summand;
-					if (r <= 8)
-						newindex = new Index(r, c);
-					break;
-
-				case Direction.Left:
 					r = Extensions.SetInRange(lastindex.Row - 1, 0, 8, out summand);
 					c = lastindex.Column - summand;
 					if (c >= 0)
 						newindex = new Index(r, c);
 					break;
 
-				case Direction.Right:
+				case Direction.Down:
 					r = Extensions.SetInRange(lastindex.Row + 1, 0, 8, out summand);
 					c = lastindex.Column + summand;
 					if (c <= 8)
 						newindex = new Index(r, c);
 					break;
 
+				case Direction.Left:
+					c = Extensions.SetInRange(lastindex.Column - 1, 0, 8, out summand);
+					r = lastindex.Row - summand;
+					if (r >= 0)
+						newindex = new Index(r, c);
+					break;
+
+				case Direction.Right:
+					c = Extensions.SetInRange(lastindex.Column + 1, 0, 8, out summand);
+					r = lastindex.Row + summand;
+					if (r <= 8)
+						newindex = new Index(r, c);
+					break;
+
 				case Direction.TabRight:
-					r = Extensions.SetInRange(lastindex.Row + 3, 0, 8, out summand);
-					c = lastindex.Column + summand * 3;
-					if (c <= 8)
+					c = Extensions.SetInRange(lastindex.Column + 3, 0, 8, out summand);
+					r = lastindex.Row + summand * 3;
+					if (r <= 8)
 						newindex = new Index(r, c);
 					break;
 			}
