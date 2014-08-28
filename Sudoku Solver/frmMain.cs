@@ -47,8 +47,6 @@ namespace SudokuSolver
 		private void Form1_Shown(object sender, EventArgs e)
 		{
 			sudokuField1.Focus();
-
-
 		}
 
 
@@ -190,6 +188,6 @@ namespace SudokuSolver
 		}
 
 
-
 	}
+
 }
