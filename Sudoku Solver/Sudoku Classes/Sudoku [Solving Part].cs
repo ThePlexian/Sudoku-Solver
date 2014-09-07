@@ -2,25 +2,51 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace SudokuSolver
 {
 	public partial class Sudoku
 	{
 
-		int missingnumbers;
-
-		public bool Solve()
+		//**** MAIN SOLVING PROCEDURE ****
+		public bool Solve(SolvingTechnique st)
 		{
-			//Calculate the amount of missing numbers
-			missingnumbers = 81;
-			foreach (Cell c in this.Cells)
-				if (c.Number != 0)
-					missingnumbers--;
+			bool success;
+			switch(st) 
+			{
+				case SolvingTechnique.HumanSolvingTechnique:
+					success = SolveHumanLike();
+					break;
+				case SolvingTechnique.TrialAndError:
+					success = SolveTrialAndError();
+					break;
+				case SolvingTechnique.Mixed:
+					success = SolveMixed();
+					break;
+				default:
+					success = false;
+					break;
+			}
 
+			if (SolvingCompleted != null)
+				SolvingCompleted(this, EventArgs.Empty);
+				
+			return success;
+		}
+
+		public enum SolvingTechnique { HumanSolvingTechnique, TrialAndError, Mixed}
+
+		public event EventHandler SolvingCompleted;
+
+
+
+		// **** HUMAN SOLVING TECHNIQUES ****
+		private bool SolveHumanLike()
+		{
 
 			//Solve
-			while (missingnumbers != 0)
+			while (this.MissingNumbers != 0)
 			{
 				bool successful = false;
 
@@ -31,7 +57,7 @@ namespace SudokuSolver
 				Enumerable.Range(2, 3).ToList().ForEach(i => successful |= HiddenSubset(i));	//296
 				successful |= LockedCandidatesType1();											//316
 				successful |= LockedCandidatesType2();											//319
-	
+
 
 
 				//If this round no number got calculated - failed
@@ -43,7 +69,7 @@ namespace SudokuSolver
 		}
 
 
-		// **** Different solving methods ****
+		// Different solving methods 
 		private bool NakedSingle()
 		{
 			bool successful = false;
@@ -230,20 +256,75 @@ namespace SudokuSolver
 
 
 
+		// **** TRIAL AND ERROR ****
+		private bool SolveTrialAndError()		//aka Back-tracking
+		{
+			//Get missing numbers
+			Cell[] tmp = new Cell[this.Cells.Length];
+			for (int i = 0; i <= this.Cells.Length - 1; i++)
+				tmp[i] = this.Cells[i / 9, i % 9]; 
+			List<Cell> missing = tmp.Where(c => c.Number == 0).ToList();
+
+
+			//If the sudoku is filled or unsolvable - exit
+			if (missing.Count == 0)
+				return true;
+			
+			if (missing.Count >= 81 - 17)
+				return false;
+
+
+
+			//Try each candidate
+			foreach (int n in missing[0].Candidates)
+			{
+				Sudoku copy = (this.Clone() as Sudoku);
+
+				//Set candidate
+				copy.SetValue(missing[0].Index, n);
+				if (CellChanged != null)
+					CellChanged(this, new CellChangedEventArgs(copy.GetCell(missing[0].Index), CellChangedEventArgs.CellProperty.Number));
+
+				//If solving was successful
+				if (copy.SolveTrialAndError())
+				{
+					this.Override(copy);
+					return true;
+				}
+			}
+
+			//No solution found
+			return false;
+		}
+
+
+
+
+
+		// **** COMBO ****
+		private bool SolveMixed()
+		{
+			return false;
+		}
+
+		
+
+
+
 		//Do what is neccessary when a new Cell number got found out
+		private void NewNumberCalculated(Cell c, int value)
+		{
+			bool b = false;
+			NewNumberCalculated(c, value, ref b);
+		}
+
 		private void NewNumberCalculated(Cell c, int value, ref bool successful) 
 		{
 			if (value == 0)
 				return;
 
-			c.Number = value;
-			c.Candidates = Cell.EmptyCandidates();
-			DeleteCandidate(c.Number, c.Index);
-			missingnumbers--;
+			this.SetValue(c.Index, value);
 			successful = true;
-
-			if (CellChanged != null)
-				CellChanged(c);
 		}
 
 
@@ -388,7 +469,7 @@ namespace SudokuSolver
 				{
 					successful = true;
 					if (CellChanged != null)
-						CellChanged(c);
+						CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
 				}
 			}
 
@@ -403,8 +484,7 @@ namespace SudokuSolver
 			foreach (Cell c in GetConnectedCells(i))
 				if (c.Candidates.Remove(candidate))
 					if (CellChanged != null)
-						CellChanged(c);
-				
+						CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
 		}
 
 		//Activates the number in the candidates of the reachable Cells
@@ -418,7 +498,7 @@ namespace SudokuSolver
 					{
 						c.Candidates.Add(candidate);
 						if (CellChanged != null)
-							CellChanged(c);
+							CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
 					}
 				}
 			}
@@ -443,7 +523,6 @@ namespace SudokuSolver
 
 			this.Cells[i.Row, i.Column].Candidates = candidates;
 		}
-
 
 	}
 }

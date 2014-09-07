@@ -47,10 +47,20 @@ namespace SudokuSolver
 			get { return _sudoku; }
 			set
 			{
+				Sudoku oldsudoku = _sudoku;
 				_sudoku = value;
 				if (_sudoku != null)
 					this.Sudoku.CellChanged += new Sudoku.CellChangedEventHandler(CellChanged);
-				this.Invalidate();
+				
+				//Invalidate
+				if (oldsudoku != null && _sudoku != null)
+				{
+					foreach (Cell c in _sudoku.GetAllCells())
+						if (!c.IsEqual(oldsudoku.GetCell(c.Index)))
+							this.Invalidate(GetRectangle(c));
+
+					this.Invoke(new Action(() => this.Update()));
+				}
 			}
 		}
 
@@ -101,6 +111,7 @@ namespace SudokuSolver
 		public Color PresetCellForeColor { get; set; }
 		[Category("Custom")]
 		public Color NonPresetCellForeColor { get; set; }
+
 
 		private bool _editingenabled;
 		private Cell _lastselectedcell;
@@ -474,9 +485,15 @@ namespace SudokuSolver
 
 
 		//Cell changed
-		private void CellChanged(Cell c)
+		private void CellChanged(object sender, Sudoku.CellChangedEventArgs e)
 		{
-			this.Invalidate(GetRectangle(c));
+			if (e.ChangedProperty.HasFlag(SudokuSolver.Sudoku.CellChangedEventArgs.CellProperty.Number) || 
+				e.ChangedProperty.HasFlag(SudokuSolver.Sudoku.CellChangedEventArgs.CellProperty.IsPreset) ||
+				(this.ShowCandidates && e.ChangedProperty.HasFlag(SudokuSolver.Sudoku.CellChangedEventArgs.CellProperty.Candidates)))
+			{
+				if (e.Cell.IsEqual(this.Sudoku.GetCell(e.Cell.Index)))
+					this.Invalidate(GetRectangle(e.Cell));
+			}
 		}
 
 
@@ -543,7 +560,7 @@ namespace SudokuSolver
 			return GetRectangle(c.Index.Row, c.Index.Column);
 		}
 
-		private Rectangle GetRectangle(Index i)
+		public Rectangle GetRectangle(Index i)
 		{
 			return GetRectangle(i.Row, i.Column);
 		}

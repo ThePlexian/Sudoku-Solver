@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Threading;
 
 namespace SudokuSolver
 {
@@ -17,14 +18,19 @@ namespace SudokuSolver
 			InitializeComponent();
 		}
 
-		//The Sudoku
+		//The Sudoku + animative stuff
 		public Sudoku _sudoku;
+
+		public Thread _solvingthread;
+		public Sudoku.SolvingTechnique _solvingmethod;
 
 
 		//Startup
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			_sudoku = new Sudoku();
+			_sudoku.CellChanged += this.CellChanged;
+			_sudoku.SolvingCompleted += this.SudokuSolvingCompleted;
 
 			this.sudokuField1.Sudoku = _sudoku;
 			this.sudokuField1.GridWidth = 1;
@@ -39,6 +45,8 @@ namespace SudokuSolver
 			this.sudokuField1.HoverActivated = true;
 			this.sudokuField1.ShowCandidates = false;
 
+			_solvingmethod = Sudoku.SolvingTechnique.HumanSolvingTechnique;
+
 			Version v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 			//this.Text += "vers. " + v.Major.ToString() + "." + v.Minor.ToString();
 			this.Text += "vers. " + v.ToString(); 
@@ -52,14 +60,69 @@ namespace SudokuSolver
 
 	
 		// **** Solve ****
+		System.Diagnostics.Stopwatch sw;
 		private void btnSolve_Click(object sender, EventArgs e)
 		{
-			_sudoku.Solve();
+			sw = System.Diagnostics.Stopwatch.StartNew();
+
+			this.customMenuStrip1.Enabled = false;
+			this.btnSolve.Enabled = false;
+			this.sudokuField1.EditingEnabled = false;
+
+
+			_solvingthread = new Thread(() => _sudoku.Solve(_solvingmethod));
+			//_solvingthread = new Thread(() => Solve1011());
+			_solvingthread.Start();
+		}
+
+		//Cell changed
+		private void CellChanged(object sender, Sudoku.CellChangedEventArgs e)
+		{
+		
+		}
+
+		//Sudoku solving procedure finished
+		private void SudokuSolvingCompleted(object sender, EventArgs e)
+		{
+			this.sudokuField1.Invalidate();
+			System.Diagnostics.Debug.Print(sw.Elapsed.TotalMilliseconds.ToString());
+
+			this.Invoke(new Action(() =>
+			{
+				this.customMenuStrip1.Enabled = true;
+				this.btnSolve.Enabled = true;
+				this.sudokuField1.EditingEnabled = true;
+			}));
 		}
 
 
 
+		//Solve 1011 Sudokus
+		private void Solve1011()
+		{
 
+			List<string> sudokus = File.ReadAllLines(@"C:\Users\Marek\Desktop\1011sudokus.txt").ToList();
+			int win = 0, total = 0;
+
+			foreach (string s in sudokus)
+			{
+				Sudoku.Read(s, ref _sudoku);
+				this.sudokuField1.Sudoku = _sudoku;
+				this.Invoke(new Action(() => this.sudokuField1.Update()));
+				_sudoku.CellChanged += this.CellChanged;
+				_sudoku.SolvingCompleted += this.SudokuSolvingCompleted;
+				total++;
+
+				System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
+				int lastwin = win;
+
+				if (_sudoku.Solve(Sudoku.SolvingTechnique.TrialAndError))
+					win++;
+
+				System.Diagnostics.Debug.Print("{0} - {1} - {2}", total, lastwin != win, sw.Elapsed.TotalMilliseconds);
+				this.Invoke(new Action(() => this.sudokuField1.Invalidate()));
+			}
+		}
 
 
 
@@ -69,6 +132,8 @@ namespace SudokuSolver
 		private void newToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			_sudoku = new Sudoku();
+			_sudoku.CellChanged += this.CellChanged;
+			_sudoku.SolvingCompleted += this.SudokuSolvingCompleted;
 			this.sudokuField1.Sudoku = _sudoku;
 		}
 
@@ -85,7 +150,7 @@ namespace SudokuSolver
 
 				if (ofd.ShowDialog() == DialogResult.OK) 
 				{
-					if (!Sudoku.Load(ofd.FileName, out _sudoku))
+					if (!Sudoku.Load(ofd.FileName, ref _sudoku))
 					{
 						MessageBox.Show("The selected file does not contain a valid sudoku text. Please select another file.", "Invalid content", MessageBoxButtons.OK, MessageBoxIcon.Error);
 						return;
@@ -144,6 +209,8 @@ namespace SudokuSolver
 		private void resetToInputToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			Sudoku temp = new Sudoku();
+			temp.CellChanged += this.CellChanged;
+			temp.SolvingCompleted += this.SudokuSolvingCompleted;
 
 			for (int i = 0; i < 81; i++)
 			{
@@ -160,6 +227,11 @@ namespace SudokuSolver
 			this.sudokuField1.Sudoku = _sudoku;
 		}
 
+		
+		private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+
+		}
 
 		private void showCandidatesToolStripMenuItem_Click(object sender, EventArgs e)
 		{
@@ -169,24 +241,38 @@ namespace SudokuSolver
 			this.sudokuField1.Invalidate();
 		}
 
-		private void allowEditingToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			ToolStripMenuItem item = (this.customMenuStrip1.Items.Find("allowEditingToolStripMenuItem", true)[0] as ToolStripMenuItem);
-			item.Checked = !item.Checked;
-			this.sudokuField1.EditingEnabled = item.Checked;
-			this.sudokuField1.Invalidate();
-		}
-
-		private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-
-		}
-
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			Application.Exit();
 		}
 
+
+		private void humanSolvingToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			(this.customMenuStrip1.Items.Find("humanSolvingToolStripMenuItem", true)[0] as ToolStripMenuItem).Checked = true;
+			(this.customMenuStrip1.Items.Find("trialAndErrorToolStripMenuItem", true)[0] as ToolStripMenuItem).Checked = false;
+			(this.customMenuStrip1.Items.Find("bothToolStripMenuItem", true)[0] as ToolStripMenuItem).Checked = false;
+
+			_solvingmethod = Sudoku.SolvingTechnique.HumanSolvingTechnique;
+		}
+
+		private void trialAndErrorToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			(this.customMenuStrip1.Items.Find("humanSolvingToolStripMenuItem", true)[0] as ToolStripMenuItem).Checked = false;
+			(this.customMenuStrip1.Items.Find("trialAndErrorToolStripMenuItem", true)[0] as ToolStripMenuItem).Checked = true;
+			(this.customMenuStrip1.Items.Find("bothToolStripMenuItem", true)[0] as ToolStripMenuItem).Checked = false;
+
+			_solvingmethod = Sudoku.SolvingTechnique.TrialAndError;
+		}
+
+		private void bothToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			(this.customMenuStrip1.Items.Find("humanSolvingToolStripMenuItem", true)[0] as ToolStripMenuItem).Checked = false;
+			(this.customMenuStrip1.Items.Find("trialAndErrorToolStripMenuItem", true)[0] as ToolStripMenuItem).Checked = false;
+			(this.customMenuStrip1.Items.Find("bothToolStripMenuItem", true)[0] as ToolStripMenuItem).Checked = true;
+
+			_solvingmethod = Sudoku.SolvingTechnique.Mixed;
+		}
 
 	}
 

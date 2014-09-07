@@ -10,3 +10,4 @@ C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver
 C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Debug\Sudoku Solver.csprojResolveAssemblyReference.cache
 C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Debug\SudokuSolver.Properties.Resources.resources
 C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Debug\SudokuSolver.frmMain.resources
+C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\bin\Debug\Sudoku Solver.exe.config

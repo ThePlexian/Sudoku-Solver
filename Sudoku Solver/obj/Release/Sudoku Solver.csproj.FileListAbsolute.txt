@@ -6,3 +6,4 @@ C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver
 C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\Sudoku Solver.csproj.GenerateResource.Cache
 C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\Sudoku Solver.exe
 C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\Sudoku Solver.pdb
+C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\bin\Release\Sudoku Solver.exe.config

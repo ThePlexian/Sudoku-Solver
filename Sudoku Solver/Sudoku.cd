@@ -1,24 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="SudokuSolver.frmMain">
-    <Position X="2.75" Y="8.5" Width="2.25" />
-    <Compartments>
-      <Compartment Name="Fields" Collapsed="true" />
-    </Compartments>
+    <Position X="2.75" Y="7.25" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>BACABAAhBKkJABAAAACCiAECDAoAAYCAAgQAACAAAAA=</HashCode>
+      <HashCode>BACABAAhBKkJABAAAACCiAECDApAAYCAAgQAACAAAAA=</HashCode>
       <FileName>frmMain.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SudokuSolver.Extensions">
-    <Position X="8" Y="8.5" Width="2" />
+    <Position X="8" Y="7.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAACgAAAAAAAAAAAAAAAgAAAAABAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Extensions.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SudokuSolver.SudokuField">
-    <Position X="0.5" Y="8.5" Width="2" />
+    <Position X="0.5" Y="7.25" Width="2" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
@@ -35,35 +32,46 @@
     </TypeIdentifier>
   </Class>
   <Class Name="SudokuSolver.Cell">
-    <Position X="8" Y="10.25" Width="2" />
+    <Position X="8" Y="9" Width="2" />
     <TypeIdentifier>
       <HashCode>BAAAAAAAAAAABAAEAUIAAAAAAAAAIAAAAAEAAAQAAAI=</HashCode>
       <FileName>Sudoku Classes\Cell.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SudokuSolver.Index">
-    <Position X="8" Y="13.5" Width="2" />
+    <Position X="8" Y="12.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAEAQBAAAAAAAAAAgAAAAAAAAAAAAA=</HashCode>
       <FileName>Sudoku Classes\Index.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="SudokuSolver.Sudoku">
-    <Position X="5.25" Y="8.5" Width="2" />
+    <Position X="5.25" Y="7.25" Width="2" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <NestedTypes>
+      <Enum Name="SudokuSolver.Sudoku.SolvingTechnique" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Sudoku Classes\Sudoku [Solving Part].cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
       <Delegate Name="SudokuSolver.Sudoku.CellChangedEventHandler" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Sudoku Classes\Sudoku.cs</NewMemberFileName>
         </TypeIdentifier>
       </Delegate>
+      <Class Name="SudokuSolver.Sudoku.CellChangedEventArgs" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Sudoku Classes\Sudoku.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>QkEAgYIGAIAAghAEAg4AjACoICgQAAhAAgBEAAABCBI=</HashCode>
+      <HashCode>QkMAgYIGAYIAghAEAg4AjACoICARAAhAAgBEACABCBI=</HashCode>
       <FileName>Sudoku Classes\Sudoku [Solving Part].cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Font Name="Segoe UI" Size="8.25" />
 </ClassDiagram>
