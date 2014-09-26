@@ -18,11 +18,8 @@ namespace SudokuSolver
 				case SolvingTechnique.HumanSolvingTechnique:
 					success = SolveHumanLike();
 					break;
-				case SolvingTechnique.TrialAndError:
-					success = SolveTrialAndError();
-					break;
-				case SolvingTechnique.Mixed:
-					success = SolveMixed();
+				case SolvingTechnique.BackTracking:
+					success = SolveBackTracking();
 					break;
 				default:
 					success = false;
@@ -35,7 +32,7 @@ namespace SudokuSolver
 			return success;
 		}
 
-		public enum SolvingTechnique { HumanSolvingTechnique, TrialAndError, Mixed}
+		public enum SolvingTechnique { HumanSolvingTechnique, BackTracking}
 
 		public event EventHandler SolvingCompleted;
 
@@ -256,9 +253,13 @@ namespace SudokuSolver
 
 
 
-		// **** TRIAL AND ERROR ****
-		private bool SolveTrialAndError()		//aka Back-tracking
+		// **** BACKTRACKING****
+		private bool SolveBackTracking()		//aka TrialAndError + Human
 		{
+			//Use human solving in the beginning
+			this.SolveHumanLike();
+
+
 			//Get missing numbers
 			Cell[] tmp = new Cell[this.Cells.Length];
 			for (int i = 0; i <= this.Cells.Length - 1; i++)
@@ -266,11 +267,12 @@ namespace SudokuSolver
 			List<Cell> missing = tmp.Where(c => c.Number == 0).ToList();
 
 
+
 			//If the sudoku is filled or unsolvable - exit
 			if (missing.Count == 0)
 				return true;
 			
-			if (missing.Count >= 81 - 17)
+			if (missing.Count >= 81 - 17 || !this.IsValid)
 				return false;
 
 
@@ -286,7 +288,7 @@ namespace SudokuSolver
 					CellChanged(this, new CellChangedEventArgs(copy.GetCell(missing[0].Index), CellChangedEventArgs.CellProperty.Number));
 
 				//If solving was successful
-				if (copy.SolveTrialAndError())
+				if (copy.SolveBackTracking())
 				{
 					this.Override(copy);
 					return true;
@@ -299,13 +301,6 @@ namespace SudokuSolver
 
 
 
-
-
-		// **** COMBO ****
-		private bool SolveMixed()
-		{
-			return false;
-		}
 
 		
 
@@ -364,7 +359,8 @@ namespace SudokuSolver
 
 		public List<Cell> GetConnectedCells(Index ind)
 		{
-			return GetCellsInRow(ind).Concat(GetCellsInColumn(ind)).Concat(GetCellsInBox(ind)).ToList();
+			return GetCellsInRow(ind).Concat(GetCellsInColumn(ind)).Concat(GetCellsInBox(ind)).
+				Where(c => !c.IsEqual(this.Cells[ind.Row, ind.Column])).ToList();
 		}
 
 

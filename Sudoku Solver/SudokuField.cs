@@ -59,7 +59,7 @@ namespace SudokuSolver
 						if (!c.IsEqual(oldsudoku.GetCell(c.Index)))
 							this.Invalidate(GetRectangle(c));
 
-					this.Invoke(new Action(() => this.Update()));
+					this.ConditionalInvoke(new Action(() => this.Update()));
 				}
 			}
 		}
@@ -188,7 +188,7 @@ namespace SudokuSolver
 
 
 			//Drawing the numbers
-			if (Sudoku != null && Sudoku.IsFilled())
+			if (Sudoku != null && Sudoku.IsFilled)
 			{
 				List<Rectangle> rects = GetListOfRectangles();
 				int i = 0;
@@ -318,8 +318,7 @@ namespace SudokuSolver
 		}
 
 		
-
-		//Keyboard interactoons
+		//Keyboard interactions
 		protected override void OnKeyPress(KeyPressEventArgs e)
 		{
 			base.OnKeyPress(e);
@@ -443,6 +442,8 @@ namespace SudokuSolver
 
 
 
+
+
 		//Resizing
 		[System.Diagnostics.DebuggerStepThrough]
 		protected override void OnResize(EventArgs eventargs)
@@ -474,14 +475,17 @@ namespace SudokuSolver
 		}
 
 
-
 		//Handle focus
+		[System.Diagnostics.DebuggerStepThrough]
 		protected override void OnLostFocus(EventArgs e)
 		{
 			base.OnLostFocus(e);
 			this.Focus();
 		}
 
+
+
+		
 
 
 		//Cell changed
@@ -560,7 +564,7 @@ namespace SudokuSolver
 			return GetRectangle(c.Index.Row, c.Index.Column);
 		}
 
-		public Rectangle GetRectangle(Index i)
+		private Rectangle GetRectangle(Index i)
 		{
 			return GetRectangle(i.Row, i.Column);
 		}
@@ -602,7 +606,5 @@ namespace SudokuSolver
 
 			return (i == allrects.Count ? new Index(-1, -1) : new Index(i / 9, i % 9));
 		}
-
-
 	}
 }

@@ -71,6 +71,9 @@
     <Compile Include="CustomMenuStrip.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Notifier\Notification.cs" />
+    <Compile Include="Notifier\Notifications.cs" />
+    <Compile Include="Notifier\NotifyEventArgs.cs" />
     <Compile Include="Sudoku Classes\AutoSortList.cs" />
     <Compile Include="Sudoku Classes\Cell.cs" />
     <Compile Include="Sudoku Classes\Index.cs" />

@@ -55,24 +55,26 @@ namespace SudokuSolver
 		}
 		public bool SetValue(int r, int c, int value)
 		{
-			if (!IsValid(value, new Index(r, c)) || this.Cells[r, c].Number == value)
-				return false;
-
 			//Adds the oldvalue as candidate in the connected cells 
 			int oldvalue = this.Cells[r, c].Number;
 			if (oldvalue != 0)
 				AddCandidate(oldvalue, new Index(r, c));
 
 			//Sets the new cell and delete the number as candidate in the connected cells
-			this.Cells[r, c].Number = value;
-			this.Cells[r, c].Candidates = Cell.EmptyCandidates();
-			if (oldvalue == 0)
-				this.MissingNumbers--;
-			DeleteCandidate(value, new Index(r, c));
+			if (value != 0)
+			{
+				this.Cells[r, c].Number = value;
+				this.Cells[r, c].Candidates = Cell.EmptyCandidates();
+				if (oldvalue == 0 && value != 0)
+					this.MissingNumbers--;
+				DeleteCandidate(value, new Index(r, c));
+			}
+
 
 			if (CellChanged != null)
 				CellChanged(this, new CellChangedEventArgs(this.Cells[r, c], CellChangedEventArgs.CellProperty.Number | CellChangedEventArgs.CellProperty.Candidates));
-			return true;
+
+			return true;	
 		}
 
 		public void SetPresetValue(Index i, bool value)
@@ -95,8 +97,10 @@ namespace SudokuSolver
 			int oldvalue = this.Cells[i.Row, i.Column].Number;
 			this.Cells[i.Row, i.Column] = new Cell(i);
 			this.MissingNumbers++;
+
 			AddCandidate(oldvalue, i);
 			RefreshCandidates(i);
+
 			if (CellChanged != null)
 				CellChanged(this, new CellChangedEventArgs(
 					this.Cells[i.Row, i.Column], CellChangedEventArgs.CellProperty.Number | CellChangedEventArgs.CellProperty.IsPreset | CellChangedEventArgs.CellProperty.Candidates));
@@ -129,9 +133,13 @@ namespace SudokuSolver
 		//Override this sudoku with another
 		public void Override(Sudoku s)
 		{
+			this.MissingNumbers = 81;
+
 			foreach (Cell c in s.Cells)
 			{
 				this.Cells[c.Index.Row, c.Index.Column] = c;
+				if (c.Number != 0)
+					this.MissingNumbers--;
 			}
 
 			this.CellChanged = null;
@@ -151,13 +159,25 @@ namespace SudokuSolver
 		}
 
 		//Checks whether the Sudoku contains Cells
-		public bool IsFilled()
+		public bool IsFilled
 		{
-			return (this.Cells != null);
+			get
+			{
+				return (this.Cells != null);
+			}
+		}
+
+		//Checks whether the Sudoku is completly filled - solved
+		public bool IsSolved
+		{
+			get
+			{
+				return this.MissingNumbers == 0;
+			}
 		}
 
 		//Checks whether the value at the given index is valid for the sudoku
-		public bool IsValid(int value, Index i)
+		public bool IsCellValid(int value, Index i)
 		{
 			//Check connected cells
 			foreach (Cell c in GetConnectedCells(i))
@@ -168,14 +188,32 @@ namespace SudokuSolver
 			return true;
 		}
 
+		//Checks whether the whole sudoku is valid
+		public bool IsValid
+		{
+			get
+			{
+				//Compare each cell with another, and return false if they are equal and not zero
+				foreach (Cell c1 in this.Cells)
+					foreach (Cell c2 in this.GetConnectedCells(c1.Index))
+						if (!c1.IsEqual(c2) && c1.Number == c2.Number && c1.Number != 0)
+							return false;
 
+				//Check whether any cell contains zero candidates
+				foreach (Cell c in this.Cells)
+					if (c.Number == 0 && c.Candidates.Count == 0)
+						return false;
+
+				return true;
+			}
+		}
 		
 		//Converts this sudoku to a string
 		public override string ToString()
 		{
 			string s = "";
 
-			if (this.IsFilled())
+			if (this.IsFilled)
 				for (int i = 0; i < 81; i++)
 					s += this.Cells[i / 9, i % 9].Number.ToString().Replace("0", ".");
 
@@ -190,8 +228,7 @@ namespace SudokuSolver
 			//Preset
 			Sudoku oldsudoku = sudoku;
 			sudoku = new Sudoku();
-			sudoku.CellChanged += oldsudoku.CellChanged;
-			sudoku.SolvingCompleted += oldsudoku.SolvingCompleted;
+
 
 			//File doesn't exist
 			if (!File.Exists(path))
@@ -201,7 +238,12 @@ namespace SudokuSolver
 			string text;
 			using (StreamReader sr = new StreamReader(path))
 				text = sr.ReadToEnd();
-	
+
+
+			//Add eventhandlers afterwards
+			sudoku.CellChanged += oldsudoku.CellChanged;
+			sudoku.SolvingCompleted += oldsudoku.SolvingCompleted;
+
 			//Read in
 			return Sudoku.Read(text, ref sudoku);
 		}
@@ -211,8 +253,6 @@ namespace SudokuSolver
 			//Preset
 			Sudoku oldsudoku = sudoku;
 			sudoku = new Sudoku();
-			sudoku.CellChanged += oldsudoku.CellChanged;
-			sudoku.SolvingCompleted += oldsudoku.SolvingCompleted;
 
 			text = text.Replace(".", "0");					//Replace, cause both dots and zeros are valid
 			text = text.Replace(" ", "");					//Replace, cause spaces are allowed as seperator, but are not necessary
@@ -240,6 +280,11 @@ namespace SudokuSolver
 				sudoku.SetPresetValue(new Index(i / 9, i % 9), (n != 0));
 				i++;
 			}
+
+
+			//Add eventhandlers afterwards
+			sudoku.CellChanged += oldsudoku.CellChanged;
+			sudoku.SolvingCompleted += oldsudoku.SolvingCompleted;
 
 			return true;
 		}

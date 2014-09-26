@@ -71,6 +71,19 @@ namespace SudokuSolver
 			  elements.SelectMany((e, i) =>
 				elements.Skip(i + 1).Combinations(k - 1).Select(c => (new[] { e }).Concat(c)));
 		}
+
+		public static object ConditionalInvoke(this System.Windows.Forms.Control ctrl, Action a)
+		{
+			if (ctrl.InvokeRequired)
+			{
+				ctrl.BeginInvoke(a);
+			}
+			else
+			{
+				a();
+			}
+			return null;
+		}
 	}
 }
 
