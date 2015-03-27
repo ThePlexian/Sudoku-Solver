@@ -53,8 +53,9 @@
     <StartupObject>SudokuSolver.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <ApplicationIcon>UI\Icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -68,31 +69,50 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomMenuStrip.cs">
+    <Compile Include="Sudoku\CellChangedEventArgs.cs" />
+    <Compile Include="UI\CustomMenuStrip.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Notifier\Notification.cs" />
     <Compile Include="Notifier\Notifications.cs" />
     <Compile Include="Notifier\NotifyEventArgs.cs" />
-    <Compile Include="Sudoku Classes\AutoSortList.cs" />
-    <Compile Include="Sudoku Classes\Cell.cs" />
-    <Compile Include="Sudoku Classes\Index.cs" />
+    <Compile Include="Sudoku\AutoSortList.cs" />
+    <Compile Include="Sudoku\Cell.cs" />
+    <Compile Include="Sudoku\Index.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Sudoku Classes\Sudoku.cs" />
-    <Compile Include="Sudoku Classes\Sudoku [Solving Part].cs" />
-    <Compile Include="SudokuField.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="frmMain.cs">
+    <Compile Include="Sudoku\Sudoku.cs" />
+    <Compile Include="Sudoku\Sudoku [Solving Part].cs" />
+    <Compile Include="UI\FrmOverwritePrompt.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMain.Designer.cs">
-      <DependentUpon>frmMain.cs</DependentUpon>
+    <Compile Include="UI\FrmOverwritePrompt.Designer.cs">
+      <DependentUpon>FrmOverwritePrompt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\FrmSudokuName.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\FrmSudokuName.Designer.cs">
+      <DependentUpon>FrmSudokuName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\FrmSudokuSelection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\FrmSudokuSelection.Designer.cs">
+      <DependentUpon>FrmSudokuSelection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SudokuField.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\FrmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\FrmMain.Designer.cs">
+      <DependentUpon>FrmMain.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="frmMain.resx">
-      <DependentUpon>frmMain.cs</DependentUpon>
+    <EmbeddedResource Include="UI\FrmMain.resx">
+      <DependentUpon>FrmMain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -104,6 +124,15 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="UI\FrmOverwritePrompt.resx">
+      <DependentUpon>FrmOverwritePrompt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\FrmSudokuName.resx">
+      <DependentUpon>FrmSudokuName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\FrmSudokuSelection.resx">
+      <DependentUpon>FrmSudokuSelection.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -139,7 +168,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Icon.ico" />
+    <Content Include="ToDo.txt" />
+    <Content Include="UI\Icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace SudokuSolver
+
+namespace SudokuSolver.Sudoku
 {
 	public class AutoSortList<T> : List<T>
 	{

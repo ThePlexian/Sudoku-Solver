@@ -1,6 +1,8 @@
-﻿namespace SudokuSolver
+﻿namespace SudokuSolver.UI
 {
-	partial class frmMain
+	using SudokuSolver.Sudoku;
+
+	partial class FrmMain
 	{
 		/// <summary>
 		/// Erforderliche Designervariable.
@@ -13,9 +15,9 @@
 		/// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
 		protected override void Dispose(bool disposing)
 		{
-			if (disposing && (components != null))
+			if (disposing && (this.components != null))
 			{
-				components.Dispose();
+				this.components.Dispose();
 			}
 			base.Dispose(disposing);
 		}
@@ -28,29 +30,33 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
+			SudokuSolver.Sudoku.Sudoku sudoku1 = new SudokuSolver.Sudoku.Sudoku();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
 			this.btnSolve = new System.Windows.Forms.Button();
-			this.sudokuField1 = new SudokuSolver.SudokuField();
-			this.customMenuStrip1 = new SudokuSolver.CustomMenuStrip();
+			this.sudokuField1 = new SudokuSolver.UI.SudokuField();
+			this.customMenuStrip1 = new SudokuSolver.UI.CustomMenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveAsTextfileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveAsBitmapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveAsXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.deleteNonPresetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.solvingMethodToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.humanSolvingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.backTrackingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.animatedSolvingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.showCandidatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.changeColorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.languageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.germanToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.englishToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.customMenuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -67,22 +73,26 @@
 			// sudokuField1
 			// 
 			this.sudokuField1.EditingEnabled = true;
-			this.sudokuField1.Font = new System.Drawing.Font("Tahoma", 13.25F);
+			this.sudokuField1.Font = new System.Drawing.Font("Calibri", 13F, System.Drawing.FontStyle.Bold);
+			this.sudokuField1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
 			this.sudokuField1.GridBorderWidth = 5;
 			this.sudokuField1.GridColor = System.Drawing.Color.Orange;
 			this.sudokuField1.GridInnerBorderWidth = 3;
 			this.sudokuField1.GridWidth = 1;
 			this.sudokuField1.HoverActivated = true;
 			this.sudokuField1.HoveredCellColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+			this.sudokuField1.IsAlwaysFocused = true;
 			this.sudokuField1.Location = new System.Drawing.Point(12, 86);
 			this.sudokuField1.Name = "sudokuField1";
 			this.sudokuField1.NonPresetCellForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(80)))), ((int)(((byte)(80)))));
 			this.sudokuField1.PresetCellBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
 			this.sudokuField1.PresetCellForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-			this.sudokuField1.SelectedCellColor = System.Drawing.Color.Red;
-			this.sudokuField1.ShowCandidates = true;
+			this.sudokuField1.SelectedCellColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(100)))), ((int)(((byte)(80)))));
+			this.sudokuField1.ShowCandidates = false;
 			this.sudokuField1.Size = new System.Drawing.Size(400, 400);
-			this.sudokuField1.Sudoku = null;
+			sudoku1.Name = "Sudoku96322692";
+			sudoku1.RaiseCellChangedEvent = false;
+			this.sudokuField1.Sudoku = sudoku1;
 			this.sudokuField1.TabIndex = 0;
 			this.sudokuField1.TabStop = false;
 			// 
@@ -92,8 +102,7 @@
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem,
             this.optionsToolStripMenuItem,
-            this.aboutToolStripMenuItem,
-            this.exitToolStripMenuItem});
+            this.aboutToolStripMenuItem});
 			this.customMenuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.customMenuStrip1.Name = "customMenuStrip1";
 			this.customMenuStrip1.Size = new System.Drawing.Size(424, 24);
@@ -105,7 +114,9 @@
 			this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newToolStripMenuItem,
             this.openToolStripMenuItem,
-            this.saveToolStripMenuItem});
+            this.saveToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.exitToolStripMenuItem});
 			this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
 			this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
 			this.fileToolStripMenuItem.Text = "File";
@@ -128,7 +139,8 @@
 			// 
 			this.saveToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveAsTextfileToolStripMenuItem,
-            this.saveAsBitmapToolStripMenuItem});
+            this.saveAsBitmapToolStripMenuItem,
+            this.saveAsXMLToolStripMenuItem});
 			this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
 			this.saveToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
 			this.saveToolStripMenuItem.Text = "Save";
@@ -146,6 +158,25 @@
 			this.saveAsBitmapToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
 			this.saveAsBitmapToolStripMenuItem.Text = "Save As Bitmap";
 			this.saveAsBitmapToolStripMenuItem.Click += new System.EventHandler(this.saveAsBitmapToolStripMenuItem_Click);
+			// 
+			// saveAsXMLToolStripMenuItem
+			// 
+			this.saveAsXMLToolStripMenuItem.Name = "saveAsXMLToolStripMenuItem";
+			this.saveAsXMLToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+			this.saveAsXMLToolStripMenuItem.Text = "Save As XML";
+			this.saveAsXMLToolStripMenuItem.Click += new System.EventHandler(this.saveAsXMLToolStripMenuItem_Click);
+			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size(100, 6);
+			// 
+			// exitToolStripMenuItem
+			// 
+			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+			this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+			this.exitToolStripMenuItem.Text = "Exit";
+			this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
 			// 
 			// editToolStripMenuItem
 			// 
@@ -166,6 +197,7 @@
 			// 
 			this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.solvingMethodToolStripMenuItem,
+            this.animatedSolvingToolStripMenuItem,
             this.showCandidatesToolStripMenuItem,
             this.changeColorsToolStripMenuItem,
             this.languageToolStripMenuItem});
@@ -185,6 +217,7 @@
 			// humanSolvingToolStripMenuItem
 			// 
 			this.humanSolvingToolStripMenuItem.Checked = true;
+			this.humanSolvingToolStripMenuItem.CheckOnClick = true;
 			this.humanSolvingToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.humanSolvingToolStripMenuItem.Name = "humanSolvingToolStripMenuItem";
 			this.humanSolvingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
@@ -193,13 +226,25 @@
 			// 
 			// backTrackingToolStripMenuItem
 			// 
+			this.backTrackingToolStripMenuItem.CheckOnClick = true;
 			this.backTrackingToolStripMenuItem.Name = "backTrackingToolStripMenuItem";
 			this.backTrackingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.backTrackingToolStripMenuItem.Text = "BackTracking";
 			this.backTrackingToolStripMenuItem.Click += new System.EventHandler(this.backTrackingToolStripMenuItem_Click);
 			// 
+			// animatedSolvingToolStripMenuItem
+			// 
+			this.animatedSolvingToolStripMenuItem.Checked = true;
+			this.animatedSolvingToolStripMenuItem.CheckOnClick = true;
+			this.animatedSolvingToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.animatedSolvingToolStripMenuItem.Name = "animatedSolvingToolStripMenuItem";
+			this.animatedSolvingToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+			this.animatedSolvingToolStripMenuItem.Text = "Animated Solving";
+			this.animatedSolvingToolStripMenuItem.Click += new System.EventHandler(this.animatedSolvingToolStripMenuItem_Click);
+			// 
 			// showCandidatesToolStripMenuItem
 			// 
+			this.showCandidatesToolStripMenuItem.CheckOnClick = true;
 			this.showCandidatesToolStripMenuItem.Name = "showCandidatesToolStripMenuItem";
 			this.showCandidatesToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
 			this.showCandidatesToolStripMenuItem.Text = "Show Candidates";
@@ -242,14 +287,7 @@
 			this.aboutToolStripMenuItem.Text = "About";
 			this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
 			// 
-			// exitToolStripMenuItem
-			// 
-			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-			this.exitToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-			this.exitToolStripMenuItem.Text = "Exit";
-			this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
-			// 
-			// frmMain
+			// FrmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -262,7 +300,7 @@
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.customMenuStrip1;
 			this.MaximizeBox = false;
-			this.Name = "frmMain";
+			this.Name = "FrmMain";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Sudoku Solver - ThePlexian - ";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
@@ -289,7 +327,6 @@
 		private System.Windows.Forms.ToolStripMenuItem saveAsBitmapToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem deleteNonPresetToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem showCandidatesToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem solvingMethodToolStripMenuItem;
@@ -300,6 +337,10 @@
 		private System.Windows.Forms.ToolStripMenuItem englishToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem backTrackingToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+		private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem saveAsXMLToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem animatedSolvingToolStripMenuItem;
 
 	}
 }

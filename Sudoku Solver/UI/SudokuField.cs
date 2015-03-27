@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.ComponentModel;
 using System.Windows.Forms;
-using System.Diagnostics;
 
-namespace SudokuSolver
+namespace SudokuSolver.UI
 {
-	public class SudokuField : System.Windows.Forms.Control
+	using System.Linq;
+	using SudokuSolver.Sudoku;
+
+	public class SudokuField : Control
 	{
 
 		//Constructor
@@ -32,35 +32,38 @@ namespace SudokuSolver
 			this.ShowCandidates = true;
 			this.EditingEnabled = true;
 
-			SelectedCell = Cell.Empty();
-			HoveredCell = Cell.Empty();
+			SelectedCell = Cell.Empty;
+			HoveredCell = Cell.Empty;
+
+			this.Sudoku = new Sudoku();
 		}
 
 
 
-		//Properties
+		#region **** Properties / Fields ****
+
 		private Sudoku _sudoku;
- 
+
 		[Category("Custom")]
-		public Sudoku Sudoku 
+		public Sudoku Sudoku
 		{
 			get { return _sudoku; }
 			set
 			{
-				Sudoku oldsudoku = _sudoku;
-				_sudoku = value;
-				if (_sudoku != null)
-					this.Sudoku.CellChanged += new Sudoku.CellChangedEventHandler(CellChanged);
-				
-				//Invalidate
-				if (oldsudoku != null && _sudoku != null)
-				{
-					foreach (Cell c in _sudoku.GetAllCells())
-						if (!c.IsEqual(oldsudoku.GetCell(c.Index)))
-							this.Invalidate(GetRectangle(c));
+				if (value == null)
+					return;
 
-					this.ConditionalInvoke(new Action(() => this.Update()));
-				}
+				var oldsudoku = _sudoku;
+				_sudoku = value;
+
+				//Invalidate
+				if (oldsudoku == null || this._sudoku == null)
+					return;
+
+				foreach (var c in this._sudoku.GetCellsIterated().Where(c => !c.IsEqual(oldsudoku.GetCell(c.Index))))
+					this.Invalidate(GetRectangle(c));
+
+				this.ConditionalInvoke(this.Update);
 			}
 		}
 
@@ -68,34 +71,37 @@ namespace SudokuSolver
 		private int _gridwidth, _gridborderwidth, _gridinnerborderwidth;
 
 		[Category("Custom")]
-		public int GridWidth { 
-			get { return _gridwidth; } 
-			set 
-			{ 
+		public int GridWidth
+		{
+			get { return _gridwidth; }
+			set
+			{
 				_gridwidth = value;
 				this.Invalidate();
-				CheckSize(); 
-			} 
+				CheckSize();
+			}
 		}
 		[Category("Custom")]
-		public int GridInnerBorderWidth { 
-			get { return _gridinnerborderwidth; } 
+		public int GridInnerBorderWidth
+		{
+			get { return _gridinnerborderwidth; }
 			set
-			{ 
+			{
 				_gridinnerborderwidth = value;
 				this.Invalidate();
-				CheckSize(); 
-			} 
+				CheckSize();
+			}
 		}
 		[Category("Custom")]
-		public int GridBorderWidth { 
-			get { return _gridborderwidth; } 
-			set 
-			{ 
+		public int GridBorderWidth
+		{
+			get { return _gridborderwidth; }
+			set
+			{
 				_gridborderwidth = value;
 				this.Invalidate();
-				CheckSize(); 
-			} 
+				CheckSize();
+			}
 		}
 		[Category("Custom")]
 		public Color GridColor { get; set; }
@@ -123,7 +129,7 @@ namespace SudokuSolver
 		public bool ShowCandidates { get; set; }
 
 		[Category("Custom")]
-		public bool EditingEnabled 
+		public bool EditingEnabled
 		{
 			get { return _editingenabled; }
 			set
@@ -131,15 +137,20 @@ namespace SudokuSolver
 				_editingenabled = value;
 				if (_editingenabled)
 				{
-					SelectedCell = (_lastselectedcell != null ? _lastselectedcell : Cell.Empty());
+					SelectedCell = (_lastselectedcell ?? Cell.Empty);
 				}
 				else
 				{
 					_lastselectedcell = SelectedCell;
-					SelectedCell = Cell.Empty();
+					SelectedCell = Cell.Empty;
 				}
 			}
 		}
+
+		[Category("Custom")]
+		public bool IsAlwaysFocused { get; set; }
+
+		#endregion
 
 
 
@@ -155,10 +166,10 @@ namespace SudokuSolver
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
 
 			//Drawing the grid
-			int curr = GetGridWidth(0) / 2;
-			int onecell = GetSizeOfOneCell().Width;
+			var curr = GetGridWidth(0) / 2;
+			var onecell = GetSizeOfOneCell().Width;
 
-			for (int s = 0; s <= 9; s++)
+			for (var s = 0; s <= 9; s++)
 			{
 				e.Graphics.DrawLine(new Pen(GridColor, GetGridWidth(s)), new Point(0, curr), new Point(this.Width, curr));
 				e.Graphics.DrawLine(new Pen(GridColor, GetGridWidth(s)), new Point(curr, 0), new Point(curr, this.Height));
@@ -168,9 +179,9 @@ namespace SudokuSolver
 
 
 			//Drawing the clicked Cell
-			if (SelectedCell != null) 
+			if (SelectedCell != null)
 			{
-				Rectangle r = GetRectangle(SelectedCell);
+				var r = GetRectangle(SelectedCell);
 				r.Inflate(-1, -1);
 				e.Graphics.FillRectangle(new SolidBrush(this.SelectedCellColor), r);
 			}
@@ -179,69 +190,69 @@ namespace SudokuSolver
 			//Drawing the hovered Cell
 			if (this.HoverActivated && HoveredCell != null)
 			{
-				Rectangle r = GetRectangle(HoveredCell);
+				var r = GetRectangle(HoveredCell);
 				r.Inflate(-1, -1);
 				e.Graphics.FillRectangle(new SolidBrush(this.HoveredCellColor), r);
 			}
-				
+
 
 
 
 			//Drawing the numbers
 			if (Sudoku != null && Sudoku.IsFilled)
 			{
-				List<Rectangle> rects = GetListOfRectangles();
-				int i = 0;
-				StringFormat sf = new StringFormat() { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+				var rects = GetListOfRectangles();
+				var i = 0;
+				var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
 
-				Brush _presetcellbackbrush = new SolidBrush(this.PresetCellBackColor);		
-				Brush _presetcellforebrush = new SolidBrush(this.PresetCellForeColor);
-				Brush _nonpresetbrush = new SolidBrush(this.NonPresetCellForeColor);
-				Brush _surroundingbrush = new SolidBrush(Extensions.MixColors(this.PresetCellForeColor, Color.Black, 0.7));
+				Brush presetcellbackbrush = new SolidBrush(this.PresetCellBackColor);
+				Brush presetcellforebrush = new SolidBrush(this.PresetCellForeColor);
+				Brush nonpresetbrush = new SolidBrush(this.NonPresetCellForeColor);
+				Brush surroundingbrush = new SolidBrush(Extensions.MixColors(this.PresetCellForeColor, Color.Black, 0.7));
 
-				foreach (Rectangle r in rects)
+				foreach (var r in rects)
 				{
 
-					string txt = Sudoku.GetCell(i / 9, i % 9).ToString();
-					
-					if (Sudoku.GetCell(i / 9, i % 9).IsPreset)
+					var txt = Sudoku.GetCell(i).ToString();
+
+					if (Sudoku.GetCell(i).IsPreset)
 					{
 						//Background
-						e.Graphics.FillRectangle(_presetcellbackbrush, r);
-						
+						e.Graphics.FillRectangle(presetcellbackbrush, r);
+
 						//Surrounding
-						Rectangle newr = r;
+						var newr = r;
 						newr.Offset(1, 1);
-						e.Graphics.DrawString(txt, this.Font, _surroundingbrush, newr, sf);
+						e.Graphics.DrawString(txt, this.Font, surroundingbrush, newr, sf);
 
 						//Number
-						e.Graphics.DrawString(txt, this.Font, _presetcellforebrush, r, sf);
+						e.Graphics.DrawString(txt, this.Font, presetcellforebrush, r, sf);
 					}
 					else
 					{
 						//Number
-						e.Graphics.DrawString(txt, this.Font, _nonpresetbrush, r, sf);
+						e.Graphics.DrawString(txt, this.Font, nonpresetbrush, r, sf);
 					}
 
 
 					//Candidates
-					if (this.ShowCandidates && Sudoku.GetCell(i / 9, i % 9).Number == 0)
+					if (this.ShowCandidates && Sudoku.GetCell(i).Number == 0)
 					{
-						Font _reducedfont = new Font(this.Font.FontFamily, 8);
+						var reducedfont = new Font(this.Font.FontFamily, 8);
 
-						int n = 1;
-						for (int y = 0; y <= 2; y++)
+						var n = 1;
+						for (var y = 0; y <= 2; y++)
 						{
-							for (int x = 0; x <= 2; x++)
+							for (var x = 0; x <= 2; x++)
 							{
-								RectangleF srect = new RectangleF(r.X + x * r.Width / 3 + 1, r.Y + y * r.Height / 3 + 1, r.Width / 3, r.Height / 3);
-								if(Sudoku.GetCell(i / 9, i % 9).Candidates.Contains(n))
-									e.Graphics.DrawString(n.ToString(), _reducedfont , _nonpresetbrush, srect, sf);
+								var srect = new RectangleF(r.X + x * r.Width / 3 + 1, r.Y + y * r.Height / 3 + 1, r.Width / 3f, r.Height / 3f);
+								if (Sudoku.GetCell(i).Candidates.Contains(n))
+									e.Graphics.DrawString(n.ToString(), reducedfont, nonpresetbrush, srect, sf);
 								n++;
 							}
 						}
 					}
-					
+
 
 					i++;
 				}
@@ -251,41 +262,42 @@ namespace SudokuSolver
 		}
 
 
-		
 
-		//Mouse interactions
-		private Cell HoveredCell;
+
+		#region **** Mouse interactions ****
+		public Cell HoveredCell;
 		public Cell SelectedCell;
 
 		protected override void OnMouseLeave(EventArgs e)
 		{
 			base.OnMouseLeave(e);
 
-			Rectangle lastr = GetRectangle(HoveredCell);
-			HoveredCell = Cell.Empty();
+			var lastr = GetRectangle(HoveredCell);
+			HoveredCell = Cell.Empty;
 			this.Invalidate(lastr);
 		}
 
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
- 			base.OnMouseDown(e);
+			base.OnMouseDown(e);
 
-			if (this.EditingEnabled)
+			if (!this.EditingEnabled)
+				return;
+
+
+			var lastr = GetRectangle(this.SelectedCell);
+			this.SelectedCell = this.Sudoku.GetCell(GetIndex(e.Location));
+			var newr = GetRectangle(this.SelectedCell);
+
+			if (lastr != newr)
 			{
-				Rectangle lastr = GetRectangle(SelectedCell);
-				SelectedCell = Sudoku.GetCell(GetIndex(e.Location));
-				Rectangle newr = GetRectangle(SelectedCell);
-
-				if (lastr != newr)
-				{
-					this.Invalidate(lastr);
-					this.Invalidate(newr);
-				}
-				else	//Same field clicked
-				{
-					SelectedCell = Cell.Empty();
-					this.Invalidate(newr);
-				}
+				this.Invalidate(lastr);
+				this.Invalidate(newr);
+			}
+			else	//Same field clicked
+			{
+				this.SelectedCell = Cell.Empty;
+				this.Invalidate(newr);
 			}
 		}
 
@@ -294,53 +306,48 @@ namespace SudokuSolver
 			base.OnMouseMove(e);
 
 			//Get last and new rectangle
-			Rectangle lastr = GetRectangle(HoveredCell);
+			var lastr = GetRectangle(HoveredCell);
 			HoveredCell = Sudoku.GetCell(GetIndex(e.Location));
-			Rectangle newr = GetRectangle(HoveredCell);
+			var newr = GetRectangle(HoveredCell);
 
 			//Only invalidate if the rects aren't the same
-			if (this.HoverActivated && lastr != newr)
-			{
-				this.Invalidate(lastr);
-				this.Invalidate(newr);
+			if (!this.HoverActivated || lastr == newr)
+				return;
 
-				//Change cursor if necessary
-				if (newr != new Rectangle(-1, -1, 1, 1))
-				{
-					this.Cursor = Cursors.Hand;
-				}
-				else
-				{
-					this.Cursor = Cursors.Default;
-				}
+			this.Invalidate(lastr);
+			this.Invalidate(newr);
 
-			}
+			//Change cursor if necessary
+			this.Cursor = (newr != new Rectangle(-1, -1, 1, 1)) ? Cursors.Hand : Cursors.Default;
 		}
 
-		
-		//Keyboard interactions
+		#endregion
+
+
+		#region **** Keyboard interactions ****
+
 		protected override void OnKeyPress(KeyPressEventArgs e)
 		{
 			base.OnKeyPress(e);
-			if (!SelectedCell.IsEqual(Cell.Empty()))
-			{
-				Index i = SelectedCell.Index;
+			if (SelectedCell.IsEqual(Cell.Empty))
+				return;
 
-				//Check whether a number is pressed
-				string PressedKey = e.KeyChar.ToString();
-				int number;
-				if (int.TryParse(PressedKey, out number))
-				{
-					if (number == 0)
-					{
-						Sudoku.ResetCell(i);
-					}
-					else
-					{
-						if (this.Sudoku.SetValue(i, number))
-							this.Sudoku.SetPresetValue(i, true);
-					}
-				}
+			var i = this.SelectedCell.Index;
+
+			//Check whether a number is pressed
+			var pressedKey = e.KeyChar.ToString();
+			int number;
+			if (!int.TryParse(pressedKey, out number))
+				return;
+
+			if (number == 0)
+			{
+				this.Sudoku.ResetCell(i);
+			}
+			else
+			{
+				if (this.Sudoku.SetValue(i, number))
+					this.Sudoku.SetPresetValue(i, true);
 			}
 		}
 
@@ -349,8 +356,17 @@ namespace SudokuSolver
 			base.OnKeyDown(e);
 
 			//No number, but perhaps Arrowkeys or Tab etc.
-			Rectangle lastr = GetRectangle(SelectedCell);
-			Index i = SelectedCell.Index;
+			var i = SelectedCell.Index;
+
+			//Cancel if no cell is selected
+			if (i.Column == -1 || i.Row == -1)
+			{
+				if (!e.KeyData.IsArrowKey())
+					return;
+				this.SelectedCell = this.Sudoku.GetCell(0, 0);
+				this.Invalidate(GetRectangle(this.SelectedCell));
+				return;
+			}
 
 			switch (e.KeyData)
 			{
@@ -363,10 +379,10 @@ namespace SudokuSolver
 				case Keys.Left:	//One step left
 					ChangeIndex(ref SelectedCell, Direction.Left);
 					break;
-				case Keys.Tab:
+				case Keys.Tab: //One block right
 					ChangeIndex(ref SelectedCell, Direction.TabRight);
 					break;
-				case Keys.Right:	//One step right
+				case Keys.Right: //One step right
 					ChangeIndex(ref SelectedCell, Direction.Right);
 					break;
 				case Keys.Delete: //Delete the number
@@ -382,15 +398,19 @@ namespace SudokuSolver
 		}
 
 
-		private enum Direction {Up, Down, Left, Right, TabRight}
+		private enum Direction { Up, Down, Left, Right, TabRight }
 		private void ChangeIndex(ref Cell cell, Direction d)
 		{
-			Index lastindex = cell.Index;
-			Index newindex = lastindex;
-			Rectangle lastr = GetRectangle(cell);
 
-			int r, c = 0;
-			int summand = 0;
+			if (cell.IsEqual(Cell.Empty))
+				return;
+
+			var lastindex = cell.Index;
+			var newindex = lastindex;
+			var lastr = GetRectangle(cell);
+
+			int r, c;
+			int summand;
 
 			switch (d)
 			{
@@ -431,16 +451,15 @@ namespace SudokuSolver
 			}
 
 			//Set and invalidate
-			if (!newindex.IsEqual(lastindex))
-			{
-				cell = this.Sudoku.GetCell(newindex);
-				this.Invalidate(lastr);
-				this.Invalidate(GetRectangle(cell));
-			}
+			if (newindex.IsEqual(lastindex))
+				return;
 
+			cell = this.Sudoku.GetCell(newindex);
+			this.Invalidate(lastr);
+			this.Invalidate(GetRectangle(cell));
 		}
 
-
+		#endregion
 
 
 
@@ -456,23 +475,23 @@ namespace SudokuSolver
 		private void CheckSize()
 		{
 			//Calculating
-			Size onecell = GetSizeOfOneCell();
+			var onecell = GetSizeOfOneCell();
 
-			Size newsize = new Size(9 * onecell.Width + 2 * GridBorderWidth + 2 * GridInnerBorderWidth + 6 * GridWidth,
+			var newsize = new Size(9 * onecell.Width + 2 * GridBorderWidth + 2 * GridInnerBorderWidth + 6 * GridWidth,
 				9 * onecell.Height + 2 * GridBorderWidth + 2 * GridInnerBorderWidth + 6 * GridWidth);
 
 
 			//Square
 			if (newsize.Width != newsize.Height)
 			{
-				int meanvalue = (int)((newsize.Width + newsize.Height) / 2);
+				var meanvalue = (newsize.Width + newsize.Height) / 2;
 				newsize = new Size(meanvalue, meanvalue);
 			}
 
 			//Conditional resize to avoid looping
-			if (this.Size != newsize)
-				this.Size = newsize;
+			this.Size = newsize;
 		}
+
 
 
 		//Handle focus
@@ -480,36 +499,22 @@ namespace SudokuSolver
 		protected override void OnLostFocus(EventArgs e)
 		{
 			base.OnLostFocus(e);
-			this.Focus();
+			if (this.IsAlwaysFocused)
+				this.Focus();
 		}
 
 
-
-		
-
-
-		//Cell changed
-		private void CellChanged(object sender, Sudoku.CellChangedEventArgs e)
-		{
-			if (e.ChangedProperty.HasFlag(SudokuSolver.Sudoku.CellChangedEventArgs.CellProperty.Number) || 
-				e.ChangedProperty.HasFlag(SudokuSolver.Sudoku.CellChangedEventArgs.CellProperty.IsPreset) ||
-				(this.ShowCandidates && e.ChangedProperty.HasFlag(SudokuSolver.Sudoku.CellChangedEventArgs.CellProperty.Candidates)))
-			{
-				if (e.Cell.IsEqual(this.Sudoku.GetCell(e.Cell.Index)))
-					this.Invalidate(GetRectangle(e.Cell));
-			}
-		}
 
 
 
 		//Useful
-		private Size GetSizeOfOneCell()
+		public Size GetSizeOfOneCell()
 		{
 			return new Size((int)Math.Floor((double)(this.Width - 2 * GridBorderWidth - 2 * GridInnerBorderWidth - 6 * GridWidth) / 9),
 				(int)Math.Floor((double)(this.Height - 2 * GridBorderWidth - 2 * GridInnerBorderWidth - 6 * GridWidth) / 9));
 		}
 
-		private int GetGridWidth(int step)
+		public int GetGridWidth(int step)
 		{
 			switch (step)
 			{
@@ -531,14 +536,14 @@ namespace SudokuSolver
 			}
 		}
 
-		private List<Rectangle> GetListOfRectangles()
+		public List<Rectangle> GetListOfRectangles()
 		{
-			int onecell = GetSizeOfOneCell().Width;
-			int currcoor = GetGridWidth(0);
+			var onecell = GetSizeOfOneCell().Width;
+			var currcoor = GetGridWidth(0);
 
 			//Get toplefts
-			List<int> toplefts = new List<int>();
-			for (int s = 0; s <= 8; s++)
+			var toplefts = new List<int>();
+			for (var s = 0; s <= 8; s++)
 			{
 				toplefts.Add(currcoor);
 				currcoor += onecell + GetGridWidth(s + 1);
@@ -546,41 +551,27 @@ namespace SudokuSolver
 
 
 			//Get rects
-			List<Rectangle> rects = new List<Rectangle>();
-			foreach (int top in toplefts)	//y
-			{
-				foreach (int left in toplefts)	//x
-				{
-					rects.Add(new Rectangle(left, top, onecell, onecell));
-				}
-			}
-
-			return rects;
+			return (from top in toplefts from left in toplefts select new Rectangle(left, top, onecell, onecell)).ToList();
 		}
 
 
-		private Rectangle GetRectangle(Cell c)
+		public Rectangle GetRectangle(Cell c)
 		{
 			return GetRectangle(c.Index.Row, c.Index.Column);
 		}
 
-		private Rectangle GetRectangle(Index i)
-		{
-			return GetRectangle(i.Row, i.Column);
-		}
-
-		private Rectangle GetRectangle(int r, int c)
+		public Rectangle GetRectangle(int r, int c)
 		{
 			if (r == -1 && c == -1)
 				return new Rectangle(-1, -1, 1, 1);
 
-			int currcoor = GetGridWidth(0);
-			int onecell = GetSizeOfOneCell().Width;
-			int left = 0;	//currcoor with column
-			int top = 0;	//currcoor with row
+			var currcoor = GetGridWidth(0);
+			var onecell = GetSizeOfOneCell().Width;
+			var left = 0;	//currcoor with column
+			var top = 0;	//currcoor with row
 
 			//Get top/left
-			for (int s = 0; s <= Math.Max(r, c); s++)
+			for (var s = 0; s <= Math.Max(r, c); s++)
 			{
 				if (s == c)
 					left = currcoor;
@@ -592,17 +583,11 @@ namespace SudokuSolver
 			return new Rectangle(left, top, onecell, onecell);
 		}
 
-		private Index GetIndex(Point pt)
+		public Index GetIndex(Point pt)
 		{
-			List<Rectangle> allrects = GetListOfRectangles();
+			var allrects = GetListOfRectangles();
 
-			int i = 0;
-			foreach (Rectangle r in allrects)
-			{
-				if (r.Contains(pt))
-					break;
-				i++;
-			}
+			var i = allrects.TakeWhile(r => !r.Contains(pt)).Count();
 
 			return (i == allrects.Count ? new Index(-1, -1) : new Index(i / 9, i % 9));
 		}

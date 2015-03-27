@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Windows.Forms;
 using System.Drawing;
 
 namespace SudokuSolver
@@ -24,8 +24,8 @@ namespace SudokuSolver
 			//Higher
 			if (n >= max)
 			{
-				int difference = n - max;
-				int rangewidth = max - min + 1;
+				var difference = n - max;
+				var rangewidth = max - min + 1;
 				distance = (int)Math.Ceiling((double)difference / rangewidth);
 				return n - distance * rangewidth;
 			}
@@ -33,8 +33,8 @@ namespace SudokuSolver
 			//Lower
 			if (n <= min)
 			{
-				int difference = Math.Abs(min - n);
-				int rangewidth = max - min + 1;
+				var difference = Math.Abs(min - n);
+				var rangewidth = max - min + 1;
 				distance = (int)Math.Ceiling((double)difference / rangewidth);
 				return n +  distance * rangewidth;
 			}
@@ -44,7 +44,7 @@ namespace SudokuSolver
 
 		public static void Swap(ref int a, ref int b)
 		{
-			int temp = a;
+			var temp = a;
 			a = b;
 			b = temp;
 		}
@@ -56,10 +56,10 @@ namespace SudokuSolver
 
 		public static Color MixColors(Color c1, Color c2, double alphavalue)
 		{
-			int a = (int)Math.Round(c1.A * alphavalue + c2.A * (1 - alphavalue));
-			int r = (int)Math.Round(c1.R * alphavalue + c2.R * (1 - alphavalue));
-			int g = (int)Math.Round(c1.G * alphavalue + c2.G * (1 - alphavalue));
-			int b = (int)Math.Round(c1.B * alphavalue + c2.B * (1 - alphavalue));
+			var a = (int)Math.Round(c1.A * alphavalue + c2.A * (1 - alphavalue));
+			var r = (int)Math.Round(c1.R * alphavalue + c2.R * (1 - alphavalue));
+			var g = (int)Math.Round(c1.G * alphavalue + c2.G * (1 - alphavalue));
+			var b = (int)Math.Round(c1.B * alphavalue + c2.B * (1 - alphavalue));
 
 			return Color.FromArgb(a, r, g, b);
 		}
@@ -67,12 +67,13 @@ namespace SudokuSolver
 		//algorithm to return all combinations of k elements from n
 		public static IEnumerable<IEnumerable<T>> Combinations<T>(this IEnumerable<T> elements, int k)
 		{
+			var enumerable = elements as IList<T> ?? elements.ToList();
 			return k == 0 ? new[] { new T[0] } :
-			  elements.SelectMany((e, i) =>
-				elements.Skip(i + 1).Combinations(k - 1).Select(c => (new[] { e }).Concat(c)));
+			  enumerable.SelectMany((e, i) =>
+				enumerable.Skip(i + 1).Combinations(k - 1).Select(c => (new[] { e }).Concat(c)));
 		}
 
-		public static object ConditionalInvoke(this System.Windows.Forms.Control ctrl, Action a)
+		public static object ConditionalInvoke(this Control ctrl, Action a)
 		{
 			if (ctrl.InvokeRequired)
 			{
@@ -83,6 +84,23 @@ namespace SudokuSolver
 				a();
 			}
 			return null;
+		}
+
+		public static bool IsArrowKey(this Keys k)
+		{
+			var arrowkeys = new List<Keys> {Keys.Left, Keys.Right, Keys.Up, Keys.Down};
+			return arrowkeys.Contains(k);
+		}
+
+		//Summarize all the items of the lists to one list and remove double entries
+		public static IEnumerable<T> CombineSortDeduplicate<T>(this IEnumerable<IEnumerable<T>> lists)
+		{
+			var temp = new List<T>();
+			foreach (var list in lists)
+				temp.AddRange(list);
+
+			temp.Sort();
+			return temp.Distinct();
 		}
 	}
 }

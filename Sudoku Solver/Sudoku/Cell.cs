@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
-namespace SudokuSolver
+namespace SudokuSolver.Sudoku
 {
+
 	public class Cell
 	{
 	
@@ -51,7 +49,7 @@ namespace SudokuSolver
 
 		public static AutoSortList<int> FullCandidates()
 		{
-			return new AutoSortList<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 }; 
+			return new AutoSortList<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 }; 
 		}
 
 		public override string ToString()
@@ -59,9 +57,12 @@ namespace SudokuSolver
 			return (this.Number != 0 ? this.Number.ToString() : "");
 		}
 
-		public static Cell Empty()
+		public static Cell Empty
 		{
-			return new Cell(new Index(-1, -1));
+			get
+			{
+				return new Cell(new Index(-1, -1));
+			}
 		}
 
 
@@ -73,12 +74,12 @@ namespace SudokuSolver
 			return (this.Number == c.Number && HaveSameCandidates(this, c) && this.IsPreset == c.IsPreset && this.Index.IsEqual(c.Index));
 		}
 
-		private bool HaveSameCandidates(Cell c1, Cell c2)
+		private static bool HaveSameCandidates(Cell c1, Cell c2)
 		{
 			if (c1.Candidates.Count != c2.Candidates.Count)
 				return false;
 
-			for (int i = 0; i <= c1.Candidates.Count - 1; i++)
+			for (var i = 0; i <= c1.Candidates.Count - 1; i++)
 			{
 				if (c1.Candidates.ElementAt(i) != c2.Candidates.ElementAt(i))
 					return false;

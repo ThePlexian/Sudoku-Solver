@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace SudokuSolver.Notifier
+﻿namespace SudokuSolver.Notifier
 {
 	public class Notification
 	{
+
+		//Constructors
+		public Notification(string t, string m, MessageType ty) : this(t, m, ty, int.MaxValue)
+		{
+		}
+
 		public Notification(string t, string m, MessageType ty, int d)
 		{
 			//Set properties
@@ -21,6 +22,7 @@ namespace SudokuSolver.Notifier
 		}
 
 
+		//Properties
 		public string Tag { get; private set; }
 		public string Message { get; set; }
 
@@ -38,19 +40,18 @@ namespace SudokuSolver.Notifier
 			}
 			set
 			{
-				if (_isactive != value)
-				{
-					_isactive = value;
-					this.InitTimer();
+				if (_isactive == value)
+					return;
 
-					if (value)
-					{
-						_timer.Start();
-						if (TimerStarted != null)
-							TimerStarted(this, new NotifyEventArgs(this));
-					}
+				_isactive = value;
+				this.InitTimer();
 
-				}
+				if (!value)
+					return;
+
+				_timer.Start();
+				if (this.TimerStarted != null)
+					this.TimerStarted(this, new NotifyEventArgs(this));
 			}
 		}
 
