@@ -1,7 +1,5 @@
 ﻿namespace SudokuSolver.Notifier
 {
-	using System;
-
 	public class Notification
 	{
 
@@ -78,7 +76,8 @@
 			};
 		}
 
-		public event EventHandler<NotifyEventArgs> TimerStarted;
-		public event EventHandler<NotifyEventArgs> TimerExpired;
+		public delegate void TimerStatusChangedEventHandler(object sender, NotifyEventArgs ne);
+		public event TimerStatusChangedEventHandler TimerStarted;
+		public event TimerStatusChangedEventHandler TimerExpired;
 	}
 }

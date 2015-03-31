@@ -473,12 +473,20 @@ namespace SudokuSolver.UI
 			foreach (var tsmi in checkedone.Owner.Items.Cast<ToolStripMenuItem>()
 			                               .Where(itm => !checkedone.Equals(itm)))
 				tsmi.Checked = false;
+
+			// Keeps the menu visible
+			checkedone.OwnerItem.OwnerItem.PerformClick();
+			checkedone.OwnerItem.Owner.Show();
+			checkedone.Owner.Show();
 		}
 
 
 		private void animatedSolvingToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			_sudoku.RaiseCellChangedEvent = !_sudoku.RaiseCellChangedEvent;
+
+			// Keeps the menu visible
+			((ToolStripMenuItem)sender).Owner.Show();
 		}
 
 		#endregion
