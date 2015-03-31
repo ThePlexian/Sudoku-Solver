@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace SudokuSolver.Notifier
 {
+	using System;
 
 	public static class Notifications
 	{
@@ -114,8 +115,7 @@ namespace SudokuSolver.Notifier
 
 
 		//Event
-		public delegate void NotifyEventHandler(object sender, NotifyEventArgs ne);
-		public static event NotifyEventHandler Notify;
+		public static event EventHandler<NotifyEventArgs> Notify;
 
 	}
 }
