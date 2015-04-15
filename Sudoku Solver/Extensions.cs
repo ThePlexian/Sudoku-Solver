@@ -41,20 +41,14 @@ namespace SudokuSolver
 
 			return 0;
 		}
-
-		public static void Swap(ref int a, ref int b)
+		private static void Swap(ref int a, ref int b)
 		{
 			var temp = a;
 			a = b;
 			b = temp;
 		}
 
-		public static Color MixColors(Color c1, Color c2) 
-		{
-			return MixColors(c1, c2, 0.5);
-		}
-
-		public static Color MixColors(Color c1, Color c2, double alphavalue)
+		public static Color MixColors(Color c1, Color c2, double alphavalue = 0.5)
 		{
 			var a = (int)Math.Round(c1.A * alphavalue + c2.A * (1 - alphavalue));
 			var r = (int)Math.Round(c1.R * alphavalue + c2.R * (1 - alphavalue));
@@ -73,17 +67,12 @@ namespace SudokuSolver
 				enumerable.Skip(i + 1).Combinations(k - 1).Select(c => (new[] { e }).Concat(c)));
 		}
 
-		public static object ConditionalInvoke(this Control ctrl, Action a)
+		public static void ConditionalInvoke(this Control ctrl, Action a)
 		{
 			if (ctrl.InvokeRequired)
-			{
 				ctrl.BeginInvoke(a);
-			}
 			else
-			{
 				a();
-			}
-			return null;
 		}
 
 		public static bool IsArrowKey(this Keys k)

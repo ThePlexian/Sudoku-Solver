@@ -1,4 +1,1 @@
-﻿- ReportProgress - BackTracking 
-- Change saving style (+ name, + preset)
-- "Current Mode"
-- Advanced Load- / SaveResults
+﻿

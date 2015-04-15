@@ -34,7 +34,7 @@ namespace SudokuSolver.UI
 
 		//Dialogue behaviour
 
-		public Sudoku.FileAccess FileAccess { get; set; }
+		public Sudoku.FileAccess FileAccess { get; private set; }
 
 
 		private void btnOverwrite_Click(object sender, EventArgs e)

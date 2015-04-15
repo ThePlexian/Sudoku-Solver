@@ -1,19 +1,18 @@
 ﻿namespace SudokuSolver.Notifier
 {
-	public class Notification
+	using System;
+
+	public class Notification : IDisposable
 	{
 
 		//Constructors
-		public Notification(string t, string m, MessageType ty) : this(t, m, ty, int.MaxValue)
-		{
-		}
-
-		public Notification(string t, string m, MessageType ty, int d)
+		public Notification(string t, string m, MessageType ty, int r, int d = int.MaxValue)
 		{
 			//Set properties
 			Tag = t;
 			Message = m;
 			Type = ty;
+			RankValue = r;
 			Duration = d;
 
 			//Add timer
@@ -24,12 +23,14 @@
 
 		//Properties
 		public string Tag { get; private set; }
-		public string Message { get; set; }
+		public string Message { get; private set; }
 
 		public enum MessageType { Error, Information, Warning, None }
 		public MessageType Type { get; private set; }
 
-		public int Duration { get; private set; }
+		private int Duration { get; set; }
+
+		public int RankValue { get; private set; }
 
 		private bool _isactive;
 		public bool IsActive
@@ -51,7 +52,7 @@
 
 				_timer.Start();
 				if (this.TimerStarted != null)
-					this.TimerStarted(this, new NotifyEventArgs(this));
+					this.TimerStarted(this, EventArgs.Empty);
 			}
 		}
 
@@ -60,7 +61,7 @@
 		//The timer
 		private System.Timers.Timer _timer;
 
-		public void InitTimer()
+		private void InitTimer()
 		{
 			if (_timer != null)
 				_timer.Stop();
@@ -72,12 +73,31 @@
 				_timer.Stop();
 
 				if (TimerExpired != null)
-					TimerExpired(this, new NotifyEventArgs(this));
+					TimerExpired(this, EventArgs.Empty);
 			};
 		}
 
-		public delegate void TimerStatusChangedEventHandler(object sender, NotifyEventArgs ne);
-		public event TimerStatusChangedEventHandler TimerStarted;
-		public event TimerStatusChangedEventHandler TimerExpired;
+		public event EventHandler TimerStarted;
+		public event EventHandler TimerExpired;
+
+
+		//IDisposable
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		private void Dispose(bool disposing)
+		{
+			if (!disposing)
+				return;
+
+			if (_timer == null)
+				return;
+
+			_timer.Dispose();
+			_timer = null;
+		}
 	}
 }

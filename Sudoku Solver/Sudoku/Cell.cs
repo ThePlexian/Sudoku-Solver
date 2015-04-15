@@ -7,26 +7,13 @@ namespace SudokuSolver.Sudoku
 	{
 	
 		//Constructors
-		public Cell(Index i) : this(0 , i)
-		{
-		}
-
-		public Cell(int number, Index i)
-		{
-			this.Number = number;
-			this.Candidates = (number == 0 ? FullCandidates() : EmptyCandidates());
-			this.Index = i;
-			this.IsPreset = false;
-		}
-
-		public Cell(AutoSortList<int> candidates, Index i)
+		public Cell(Index i)
 		{
 			this.Number = 0;
-			this.Candidates = candidates;
+			this.Candidates = FullCandidates();
 			this.Index = i;
 			this.IsPreset = false;
 		}
-		
 
 
 		//Properties
@@ -36,7 +23,7 @@ namespace SudokuSolver.Sudoku
 
 		public bool IsPreset { get; set; }
 		
-		public Index Index { get; set; }
+		public Index Index { get; private set; }
 
 
 

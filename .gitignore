@@ -15,10 +15,9 @@ $RECYCLE.BIN/
 *.msp
 
 #Folders and speicific files
-/bin
-/obj
-/Properties
-Sudoku.cd
+bin/
+obj/
+Properties
 ToDo.txt
 
 # =========================

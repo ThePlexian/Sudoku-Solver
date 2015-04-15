@@ -66,7 +66,7 @@
 			this.btnSolve.Name = "btnSolve";
 			this.btnSolve.Size = new System.Drawing.Size(197, 34);
 			this.btnSolve.TabIndex = 11;
-			this.btnSolve.Text = "Solve";
+			this.btnSolve.Text = "Solve - Human Solving";
 			this.btnSolve.UseVisualStyleBackColor = true;
 			this.btnSolve.Click += new System.EventHandler(this.btnSolve_Click);
 			// 

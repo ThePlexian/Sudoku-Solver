@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
 
-
 namespace SudokuSolver.UI
 {
 	using SudokuSolver.Sudoku;
@@ -91,6 +90,7 @@ namespace SudokuSolver.UI
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
 			//The notification to be displayed
+
 			var n = Notifier.Notifications.TopMost;
 
 			if (n != null)
@@ -131,7 +131,7 @@ namespace SudokuSolver.UI
 
 
 		//Notification started / expired
-		private void Notified(object sender, Notifier.NotifyEventArgs ne)
+		private void Notified(object sender, EventArgs e)
 		{
 			this.ConditionalInvoke(() => this.Invalidate(_notirectangle));
 		}
@@ -168,33 +168,26 @@ namespace SudokuSolver.UI
 			//Update notifier
 			if (_swsolving == null || !_swsolving.IsRunning || _solvingmethod == Sudoku.SolvingTechnique.HumanSolvingTechnique)
 			{
-				Notifier.Notifications.ChangeState("Invalid", !_sudoku.IsValid);
 				Notifier.Notifications.ChangeState("Unambiguous", _sudoku.MissingNumbers > 81 - 17);
-			}
-
-			switch (_solvingmethod)
-			{
-				case Sudoku.SolvingTechnique.HumanSolvingTechnique:
-					if (e == null)
-						return;
-
-					var cp = e.ChangedProperty;
-					if (!cp.HasFlag(CellChangedEventArgs.CellProperty.Number) &&
-						!cp.HasFlag(CellChangedEventArgs.CellProperty.IsPreset) &&
-						(!this.sudokuField1.ShowCandidates || !cp.HasFlag(CellChangedEventArgs.CellProperty.Candidates)))
-						return;
-
-					if (cp.HasFlag(CellChangedEventArgs.CellProperty.Number) && e.Cell.IsEqual(_sudoku.GetCell(e.Cell.Index)))
-						this.sudokuField1.Invalidate(sudokuField1.GetRectangle(e.Cell));
-
-					break;
-
-				case Sudoku.SolvingTechnique.BackTracking:
-					break;
+				Notifier.Notifications.ChangeState("Invalid", !_sudoku.IsValid);
 			}
 
 
+			//Update sudoku field
+			if (_solvingmethod != Sudoku.SolvingTechnique.HumanSolvingTechnique)
+				return;
 
+			if (e == null)
+				return;
+
+			var cp = e.ChangedProperty;
+			if (!cp.HasFlag(CellChangedEventArgs.CellProperty.Number) &&
+			    !cp.HasFlag(CellChangedEventArgs.CellProperty.IsPreset) &&
+			    (!this.sudokuField1.ShowCandidates || !cp.HasFlag(CellChangedEventArgs.CellProperty.Candidates)))
+				return;
+
+			if (cp.HasFlag(CellChangedEventArgs.CellProperty.Number) && e.Cell.IsEqual(this._sudoku.GetCell(e.Cell.Index)))
+				this.sudokuField1.Invalidate(this.sudokuField1.GetRectangle(e.Cell));
 		}
 
 		//Sudoku solving procedure finished
@@ -269,12 +262,13 @@ namespace SudokuSolver.UI
 						result = Sudoku.LoadXml(ofd.FileName, out sudokus);
 						break;
 				}
-				
+
 				//Loading not sucessful
 				if (result != Sudoku.LoadingProcessResult.Success)
 				{
 					//Add notification
-					Notifier.Notifications.ChangeState("Invalid File", true);
+					if (result == Sudoku.LoadingProcessResult.InvalidFileContent)
+						Notifier.Notifications.ChangeState("Invalid File Content", true);
 
 					//Reset sudoku
 					_sudoku = new Sudoku();
@@ -340,7 +334,18 @@ namespace SudokuSolver.UI
 
 
 				var res = _sudoku.SaveTxt(sfd.FileName, fa);
-				Notifier.Notifications.ChangeState("Saved", true);
+				switch (res)
+				{
+					case Sudoku.SavingProcessResult.Success :
+						Notifier.Notifications.ChangeState("Saved", true);
+						break; 
+					case Sudoku.SavingProcessResult.FileAlreadyExists :
+						Notifier.Notifications.ChangeState("Saving Path Exists", true);
+						break; 
+					case Sudoku.SavingProcessResult.UnauthorizedAccess :
+						Notifier.Notifications.ChangeState("Unauthorized File Access", true);
+						break; 
+				}
 			}
 		}
 
@@ -411,10 +416,20 @@ namespace SudokuSolver.UI
 					fsn.ShowDialog();
 
 				var res = _sudoku.SaveXml(sfd.FileName, fa);
-				Notifier.Notifications.ChangeState("Saved", true);
+				switch (res)
+				{
+					case Sudoku.SavingProcessResult.Success:
+						Notifier.Notifications.ChangeState("Saved", true);
+						break;
+					case Sudoku.SavingProcessResult.FileAlreadyExists:
+						Notifier.Notifications.ChangeState("Saving Path Exists", true);
+						break;
+					case Sudoku.SavingProcessResult.UnauthorizedAccess:
+						Notifier.Notifications.ChangeState("Unauthorized File Access", true);
+						break;
+				}
 			}
 		}
-
 
 
 		private void deleteNonPresetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -460,18 +475,22 @@ namespace SudokuSolver.UI
 		{
 			UncheckOtherSolvingTechnique((ToolStripMenuItem)sender);
 			_solvingmethod = Sudoku.SolvingTechnique.HumanSolvingTechnique;
+
+			btnSolve.Text = "Solve - Human Solving";
 		}
 
 		private void backTrackingToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			UncheckOtherSolvingTechnique((ToolStripMenuItem)sender);
 			_solvingmethod = Sudoku.SolvingTechnique.BackTracking;
+
+			btnSolve.Text = "Solve - BackTracking";
 		}
 
 		private void UncheckOtherSolvingTechnique(ToolStripMenuItem checkedone)
 		{
 			foreach (var tsmi in checkedone.Owner.Items.Cast<ToolStripMenuItem>()
-			                               .Where(itm => !checkedone.Equals(itm)))
+										   .Where(itm => !checkedone.Equals(itm)))
 				tsmi.Checked = false;
 
 			// Keeps the menu visible

@@ -33,7 +33,7 @@ namespace SudokuSolver.UI
 
 
 		//The sudokus to be shown
-		public List<Sudoku> Sudokus { get; set; }
+		public List<Sudoku> Sudokus { private get; set; }
 
 		//The selected sudoku
 		public Sudoku SelectedSudoku { get; private set; }

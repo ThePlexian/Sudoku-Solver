@@ -9,8 +9,8 @@
 			this.Column = c;
 		}
 
-		public int Row;
-		public int Column;
+		public readonly int Row;
+		public readonly int Column;
 
 
 		public bool IsEqual(Index i)

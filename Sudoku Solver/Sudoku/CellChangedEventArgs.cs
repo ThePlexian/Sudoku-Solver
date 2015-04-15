@@ -10,8 +10,8 @@ namespace SudokuSolver.Sudoku
 			this.ChangedProperty = cp;
 		}
 
-		public Cell Cell { get; set; }
-		public CellProperty ChangedProperty { get; set; }
+		public Cell Cell { get; private set; }
+		public CellProperty ChangedProperty { get; private set; }
 		public static new CellChangedEventArgs Empty { get { return new CellChangedEventArgs(Cell.Empty, CellProperty.None); } }
 
 		[Flags]

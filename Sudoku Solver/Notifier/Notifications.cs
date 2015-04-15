@@ -1,8 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Linq;
 
 namespace SudokuSolver.Notifier
 {
+	using System;
+	using System.Collections.Generic;
 
 	public static class Notifications
 	{
@@ -11,64 +12,55 @@ namespace SudokuSolver.Notifier
 		static Notifications()
 		{
 			//Add notifications to list
-			Components = new ObservableCollection<Notification>
-			                 {
-				                 new Notification("Solved",
-				                                  "Sudoku solved in [0]ms.",
-				                                  Notification.MessageType.Information, 8000),
-				                 new Notification("Unsolved",
-				                                  "Sudoku could not be solved - [0] numbers remaining.",
-				                                  Notification.MessageType.Error, 8000),
-				                 new Notification("Unambiguous",
-				                                  "You have to enter more than 17 numbers, otherwise the sudoku is not ambiguous solvable.",
-				                                  Notification.MessageType.Warning),
-				                 new Notification("Invalid",
-				                                  "The entered sudoku is invalid.",
-				                                  Notification.MessageType.Error),
-				                 new Notification("Invalid File",
-				                                  "The file you selected doesn't contain a valid sudoku.\nPlease select another one.",
-				                                  Notification.MessageType.Error, 8000),
-				                 new Notification("Saved",
-				                                  "File saved successfully.",
-				                                  Notification.MessageType.Information, 8000),
-								 new Notification("Loaded",
-												  "Sudoku \"[0]\" successfully loaded.",
-												  Notification.MessageType.Information, 8000)
-			                 };
+			_components = new List<Notification>
+			              {
+				              new Notification("Solved", "Sudoku solved in [0]ms.",
+				                               Notification.MessageType.Information, 2, 8000),
+				              new Notification("Unsolved", "Sudoku could not be solved - [0] numbers remaining.",
+				                               Notification.MessageType.Error, 2, 8000),
+				              new Notification("Invalid", "The entered sudoku is invalid.",
+				                               Notification.MessageType.Error, 1),
+				              new Notification("Unambiguous",
+				                               "You have to enter more than 17 numbers, otherwise the sudoku is not ambiguous solvable.",
+				                               Notification.MessageType.Warning, 3),
+				              new Notification("Invalid File Content",
+				                               "The file you selected doesn't contain a valid sudoku.\nPlease select another one.",
+				                               Notification.MessageType.Error, 1, 8000),
+				              new Notification("Saving Path Exists",
+				                               "The path you selected for saving already exists.\nPlease select another one.",
+				                               Notification.MessageType.Error, 1, 8000),
+				              new Notification("Unauthorized File Access",
+				                               "You don't have the necessary access permissions to save the file at the selected path.",
+				                               Notification.MessageType.Error, 1, 8000),
+				              new Notification("Saved", "File saved successfully.",
+				                               Notification.MessageType.Information, 2, 8000),
+				              new Notification("Loaded", "Sudoku \"[0]\" successfully loaded.",
+				                               Notification.MessageType.Information, 2, 8000)
+			              };
 
 
 			//Raise the Notify Event if the timer of any notification started / expired
-			foreach (var n in Components)
+			foreach (var n in _components)
 			{
-				n.TimerStarted += (s, ne) =>
-								  {
-									  if (Notify != null)
-										  Notify(s, ne);
-								  };
+				Action<object, EventArgs> notifyAction = (s, e) =>
+				                                         {
+					                                         if (Notify != null)
+						                                         Notify(s, e);
+				                                         };
 
-				n.TimerExpired += (s, ne) =>
-								  {
-									  if (Notify != null)
-										  Notify(s, ne);
-								  };
-
+				n.TimerStarted += (s, e) => notifyAction(s, e);
+				n.TimerExpired += (s, e) => notifyAction(s, e);
 			}
 
-			//When the collection changes, notify
-			Components.CollectionChanged += (s, e) =>
-											{
-												if (Notify != null)
-													Notify(s, null);
-											};
 		}
 
 
 		//Member
-		private static readonly ObservableCollection<Notification> Components;
+		private static List<Notification> _components;
 
 
 		//Returns the topmost notification
-		public static Notification TopMost { get { return Components.FirstOrDefault(n => n.IsActive); } }
+		public static Notification TopMost { get { return _components.FirstOrDefault(n => n.IsActive); } }
 
 
 
@@ -93,20 +85,26 @@ namespace SudokuSolver.Notifier
 			n.IsActive = state;
 
 			//Set as topmost
-			Components.Move(Components.IndexOf(n), 0);
+			_components = _components.OrderBy(noti => noti.IsActive)
+			                         .ThenBy(noti => noti.RankValue)
+			                         .ToList();
+
 
 			if (Notify != null)
-				Notify(null, new NotifyEventArgs(n));
+				Notify(null, EventArgs.Empty);
 		}
 
 		public static void Reset()
 		{
-			Components.ToList().ForEach(n => n.IsActive = false);
+			_components.ToList().ForEach(n => n.IsActive = false);
+
+			if (Notify != null)
+				Notify(null, null);
 		}
 
 		private static Notification GetNotification(string key)
 		{
-			return Components.FirstOrDefault(n => n.Tag == key);
+			return _components.FirstOrDefault(n => n.Tag == key);
 		}
 
 
@@ -114,8 +112,7 @@ namespace SudokuSolver.Notifier
 
 
 		//Event
-		public delegate void NotifyEventHandler(object sender, NotifyEventArgs ne);
-		public static event NotifyEventHandler Notify;
+		public static event EventHandler Notify;
 
 	}
 }

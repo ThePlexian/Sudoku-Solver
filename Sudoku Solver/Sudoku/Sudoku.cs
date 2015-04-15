@@ -1,6 +1,4 @@
-﻿
-
-namespace SudokuSolver.Sudoku
+﻿namespace SudokuSolver.Sudoku
 {
 
 	using System;
@@ -21,11 +19,11 @@ namespace SudokuSolver.Sudoku
 		//Constructors
 		public Sudoku() : this(EmptyCellArray()) { }
 
-		public Sudoku(string name) : this(EmptyCellArray(), name) { }
+		private Sudoku(string name) : this(EmptyCellArray(), name) { }
 
-		public Sudoku(Cell[,] cells) : this(cells, "Sudoku" + Environment.TickCount) { }
+		private Sudoku(Cell[,] cells) : this(cells, "Sudoku - " + DateTime.Now) { }
 
-		public Sudoku(Cell[,] cells, string name)
+		private Sudoku(Cell[,] cells, string name)
 		{
 			if ((cells.GetLength(0) != 9) || (cells.GetLength(1) != 9))
 				return;
@@ -73,13 +71,6 @@ namespace SudokuSolver.Sudoku
 			}
 		}
 
-		//Checks whether the value at the given index is valid for the sudoku
-		public bool IsCellValid(int value, Index i)
-		{
-			//Check connected cells
-			return GetConnectedCells(i).All(c => c.Number != value);
-		}
-
 		//Checks whether the whole sudoku is valid
 		public bool IsValid
 		{
@@ -94,8 +85,6 @@ namespace SudokuSolver.Sudoku
 							c.Number != 0 || c.Candidates.Count != 0);
 
 				return b1 && b2;
-
-
 			}
 		}
 
@@ -137,7 +126,7 @@ namespace SudokuSolver.Sudoku
 			return SetValue(i / 9, i % 9, value);
 		}
 
-		public bool SetValue(int r, int c, int value)
+		private bool SetValue(int r, int c, int value)
 		{
 			//Adds the oldvalue as candidate in the connected cells 
 			var oldvalue = this.Cells[r, c].Number;
@@ -173,7 +162,7 @@ namespace SudokuSolver.Sudoku
 			SetPresetValue(i / 9, i % 9, value);
 		}
 
-		public void SetPresetValue(int r, int c, bool value)
+		private void SetPresetValue(int r, int c, bool value)
 		{
 			this.Cells[r, c].IsPreset = value;
 			if (this.CellChanged != null && RaiseCellChangedEvent)
@@ -197,11 +186,6 @@ namespace SudokuSolver.Sudoku
 
 
 		//Get All
-		public Cell[,] GetCells()
-		{
-			return this.Cells;
-		}
-
 		public IEnumerable<Cell> GetCellsIterated()
 		{
 			foreach (var cell in Cells)
@@ -231,7 +215,7 @@ namespace SudokuSolver.Sudoku
 		}
 
 		//Override this sudoku with another
-		public void Override(Sudoku s)
+		private void Override(Sudoku s)
 		{
 			this.OverrideValues(s);
 
@@ -256,7 +240,7 @@ namespace SudokuSolver.Sudoku
 		}
 
 		//Returns a complete Cellarray with empty cells
-		public static Cell[,] EmptyCellArray()
+		private static Cell[,] EmptyCellArray()
 		{
 			var temp = new Cell[9, 9];
 
@@ -281,10 +265,10 @@ namespace SudokuSolver.Sudoku
 			return this.Name + ": " + cells;
 		}
 
-		public string CellsToString()
+		private string CellsToString()
 		{
 			return string.Join("", this.GetCellsIterated()
-			                           .Select(c => c.Number == 0 ? "." : c.ToString()));
+									   .Select(c => c.Number == 0 ? "." : c.ToString()));
 		}
 
 
@@ -293,16 +277,13 @@ namespace SudokuSolver.Sudoku
 		#region **** LOADING / SAVING ****
 
 		public enum FileAccess { CreateOnly, CreateOrOverwrite, CreateOrAppend }
-		public enum LoadingProcessResult { Success, InvalidPath, InvalidFileContent }
+		public enum LoadingProcessResult { Success, InvalidFileContent }
 		public enum SavingProcessResult { Success, FileAlreadyExists, UnauthorizedAccess }
 
 		public static LoadingProcessResult LoadTxt(string path, out List<Sudoku> sudokus)
 		{
 			sudokus = new List<Sudoku>();
 
-			//File doesn't exist
-			if (!File.Exists(path))
-				return LoadingProcessResult.InvalidPath;
 
 			//Start reading
 			var text = File.ReadAllLines(path);
@@ -326,10 +307,6 @@ namespace SudokuSolver.Sudoku
 		public static LoadingProcessResult LoadXml(string path, out List<Sudoku> sudokus)
 		{
 			sudokus = new List<Sudoku>();
-
-			//File doesn't exist
-			if (!File.Exists(path))
-				return LoadingProcessResult.InvalidPath;
 
 			//Start reading
 			try
@@ -364,7 +341,7 @@ namespace SudokuSolver.Sudoku
 							var validline = Sudoku.ReadLine(cells, ref s);
 							for (var i = 0; i <= 80; i++)
 								s.SetPresetValue(i, preset[i] == 'p');
-							
+
 							sudokus.Add(validline ? s : null);
 						}
 				}
