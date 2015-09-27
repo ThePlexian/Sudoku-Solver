@@ -11,7 +11,7 @@
 	{
 
 		//Fields
-		private Cell[,] Cells { get; set; }
+		private Cell[,] Cells { get; }
 		public int MissingNumbers { get; private set; }
 
 
@@ -28,18 +28,18 @@
 			if ((cells.GetLength(0) != 9) || (cells.GetLength(1) != 9))
 				return;
 
-			this.Cells = cells;
-			this.MissingNumbers = 0;
-			foreach (var c in this.Cells)
+			Cells = cells;
+			MissingNumbers = 0;
+			foreach (var c in Cells)
 			{
 				if (c.Number != 0)
 					DeleteCandidate(c.Number, c.Index);
 				if (c.Number == 0)
-					this.MissingNumbers++;
+					MissingNumbers++;
 			}
 
-			this.Name = name;
-			this.RaiseCellChangedEvent = true;
+			Name = name;
+			RaiseCellChangedEvent = true;
 		}
 
 
@@ -58,7 +58,7 @@
 		{
 			get
 			{
-				return (this.Cells != null);
+				return (Cells != null);
 			}
 		}
 
@@ -67,7 +67,7 @@
 		{
 			get
 			{
-				return this.MissingNumbers == 0;
+				return MissingNumbers == 0;
 			}
 		}
 
@@ -78,7 +78,7 @@
 			{
 				//Compare each cell with another, and return false if they are equal and not zero
 				var b1 = !GetCellsIterated().Any(c1 =>
-												 this.GetConnectedCells(c1.Index).Any(c2 =>
+												 GetConnectedCells(c1.Index).Any(c2 =>
 																					  !c1.IsEqual(c2) && c1.Number == c2.Number && c1.Number != 0));
 				//Check whether any cell contains zero candidates
 				var b2 = GetCellsIterated().All(c =>
@@ -111,7 +111,7 @@
 			if (r == -1 || c == -1)
 				return Cell.Empty;
 
-			return this.Cells[r, c];
+			return Cells[r, c];
 		}
 
 
@@ -129,23 +129,23 @@
 		private bool SetValue(int r, int c, int value)
 		{
 			//Adds the oldvalue as candidate in the connected cells 
-			var oldvalue = this.Cells[r, c].Number;
+			var oldvalue = Cells[r, c].Number;
 			if (oldvalue != 0)
 				AddCandidate(oldvalue, new Index(r, c));
 
 			//Sets the new cell and delete the number as candidate in the connected cells
 			if (value != 0)
 			{
-				this.Cells[r, c].Number = value;
-				this.Cells[r, c].Candidates = Cell.EmptyCandidates();
+				Cells[r, c].Number = value;
+				Cells[r, c].Candidates = Cell.EmptyCandidates();
 				if (oldvalue == 0 && value != 0)
-					this.MissingNumbers--;
+					MissingNumbers--;
 				DeleteCandidate(value, new Index(r, c));
 			}
 
 
-			if (this.CellChanged != null && RaiseCellChangedEvent)
-				this.CellChanged(this, new CellChangedEventArgs(this.Cells[r, c], CellChangedEventArgs.CellProperty.Number | CellChangedEventArgs.CellProperty.Candidates));
+			if (CellChanged != null && RaiseCellChangedEvent)
+				CellChanged(this, new CellChangedEventArgs(Cells[r, c], CellChangedEventArgs.CellProperty.Number | CellChangedEventArgs.CellProperty.Candidates));
 
 			return true;
 		}
@@ -164,24 +164,24 @@
 
 		private void SetPresetValue(int r, int c, bool value)
 		{
-			this.Cells[r, c].IsPreset = value;
-			if (this.CellChanged != null && RaiseCellChangedEvent)
-				this.CellChanged(this, new CellChangedEventArgs(this.Cells[r, c], CellChangedEventArgs.CellProperty.IsPreset));
+			Cells[r, c].IsPreset = value;
+			if (CellChanged != null && RaiseCellChangedEvent)
+				CellChanged(this, new CellChangedEventArgs(Cells[r, c], CellChangedEventArgs.CellProperty.IsPreset));
 		}
 
 		//Reset
 		public void ResetCell(Index i)
 		{
-			var oldvalue = this.Cells[i.Row, i.Column].Number;
-			this.Cells[i.Row, i.Column] = new Cell(i);
-			this.MissingNumbers++;
+			var oldvalue = Cells[i.Row, i.Column].Number;
+			Cells[i.Row, i.Column] = new Cell(i);
+			MissingNumbers++;
 
 			AddCandidate(oldvalue, i);
 			RefreshCandidates(i);
 
-			if (this.CellChanged != null && RaiseCellChangedEvent)
-				this.CellChanged(this, new CellChangedEventArgs(
-					this.Cells[i.Row, i.Column], CellChangedEventArgs.CellProperty.Number | CellChangedEventArgs.CellProperty.IsPreset | CellChangedEventArgs.CellProperty.Candidates));
+			if (CellChanged != null && RaiseCellChangedEvent)
+				CellChanged(this, new CellChangedEventArgs(
+					Cells[i.Row, i.Column], CellChangedEventArgs.CellProperty.Number | CellChangedEventArgs.CellProperty.IsPreset | CellChangedEventArgs.CellProperty.Candidates));
 		}
 
 
@@ -202,14 +202,14 @@
 		{
 			var temp = new Sudoku();
 
-			foreach (var c in this.Cells)
+			foreach (var c in Cells)
 			{
 				temp.SetValue(c.Index, c.Number);
 				temp.SetPresetValue(c.Index, c.IsPreset);
 			}
 
-			temp.CellChanged += this.CellChanged;
-			temp.SolvingCompleted += this.SolvingCompleted;
+			temp.CellChanged += CellChanged;
+			temp.SolvingCompleted += SolvingCompleted;
 
 			return temp;
 		}
@@ -217,25 +217,25 @@
 		//Override this sudoku with another
 		private void Override(Sudoku s)
 		{
-			this.OverrideValues(s);
+			OverrideValues(s);
 
-			this.CellChanged = null;
-			this.CellChanged += s.CellChanged;
-			this.SolvingCompleted = null;
-			this.SolvingCompleted += s.SolvingCompleted;
+			CellChanged = null;
+			CellChanged += s.CellChanged;
+			SolvingCompleted = null;
+			SolvingCompleted += s.SolvingCompleted;
 		}
 
 		//Override this sudoku, but only its values
 		public void OverrideValues(Sudoku s)
 		{
-			this.Name = s.Name;
+			Name = s.Name;
 
-			this.MissingNumbers = 81;
+			MissingNumbers = 81;
 			foreach (var c in s.Cells)
 			{
-				this.Cells[c.Index.Row, c.Index.Column] = c;
+				Cells[c.Index.Row, c.Index.Column] = c;
 				if (c.Number != 0)
-					this.MissingNumbers--;
+					MissingNumbers--;
 			}
 		}
 
@@ -256,18 +256,18 @@
 		{
 			var cells = "";
 
-			if (!this.IsFilled)
-				return this.Name + ": " + cells;
+			if (!IsFilled)
+				return Name + ": " + cells;
 
 			for (var i = 0; i < 81; i++)
 				cells += GetCell(i).Number.ToString().Replace("0", ".");
 
-			return this.Name + ": " + cells;
+			return Name + ": " + cells;
 		}
 
 		private string CellsToString()
 		{
-			return string.Join("", this.GetCellsIterated()
+			return string.Join("", GetCellsIterated()
 									   .Select(c => c.Number == 0 ? "." : c.ToString()));
 		}
 
@@ -293,7 +293,7 @@
 			{
 				//Read
 				var s = new Sudoku("Sudoku No. " + counter);
-				if (!Sudoku.ReadLine(line, ref s))
+				if (!ReadLine(line, ref s))
 					return LoadingProcessResult.InvalidFileContent;
 
 				//Add if successful
@@ -338,7 +338,7 @@
 							var preset = item2.InnerText;
 
 							//Adjust cells
-							var validline = Sudoku.ReadLine(cells, ref s);
+							var validline = ReadLine(cells, ref s);
 							for (var i = 0; i <= 80; i++)
 								s.SetPresetValue(i, preset[i] == 'p');
 
@@ -412,7 +412,7 @@
 					if (append)
 						sw.WriteLine();
 
-					sw.Write(this.CellsToString());
+					sw.Write(CellsToString());
 				}
 			}
 			catch
@@ -480,15 +480,15 @@
 
 			//Name
 			var name = doc.CreateElement(string.Empty, "Name", string.Empty);
-			name.AppendChild(doc.CreateTextNode(this.Name));
+			name.AppendChild(doc.CreateTextNode(Name));
 
 			//Cells
 			var cells = doc.CreateElement(string.Empty, "Cells", string.Empty);
-			cells.AppendChild(doc.CreateTextNode(this.CellsToString()));
+			cells.AppendChild(doc.CreateTextNode(CellsToString()));
 
 			//Preset
 			var presets = doc.CreateElement(string.Empty, "Preset", string.Empty);
-			presets.AppendChild(doc.CreateTextNode(string.Join("", this.GetCellsIterated().ToList().Select(c => c.IsPreset ? "p" : "."))));
+			presets.AppendChild(doc.CreateTextNode(string.Join("", GetCellsIterated().ToList().Select(c => c.IsPreset ? "p" : "."))));
 
 			parent.SetAttributeNode(date);
 			parent.AppendChild(name);

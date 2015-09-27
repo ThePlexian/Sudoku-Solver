@@ -16,8 +16,8 @@
 			Duration = d;
 
 			//Add timer
-			this.InitTimer();
-			this.IsActive = false;
+			InitTimer();
+			IsActive = false;
 		}
 
 
@@ -28,7 +28,7 @@
 		public enum MessageType { Error, Information, Warning, None }
 		public MessageType Type { get; private set; }
 
-		private int Duration { get; set; }
+		private int Duration { get; }
 
 		public int RankValue { get; private set; }
 
@@ -45,14 +45,14 @@
 					return;
 
 				_isactive = value;
-				this.InitTimer();
+				InitTimer();
 
 				if (!value)
 					return;
 
 				_timer.Start();
-				if (this.TimerStarted != null)
-					this.TimerStarted(this, EventArgs.Empty);
+				if (TimerStarted != null)
+					TimerStarted(this, EventArgs.Empty);
 			}
 		}
 
@@ -65,11 +65,11 @@
 		{
 			if (_timer != null)
 				_timer.Stop();
-			_timer = new System.Timers.Timer(this.Duration);
+			_timer = new System.Timers.Timer(Duration);
 			_timer.Elapsed += (s, e) =>
 			{
 				//Deactivate this
-				this.IsActive = false;
+				IsActive = false;
 				_timer.Stop();
 
 				if (TimerExpired != null)

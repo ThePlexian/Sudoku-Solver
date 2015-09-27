@@ -9,10 +9,10 @@ namespace SudokuSolver.Sudoku
 		//Constructors
 		public Cell(Index i)
 		{
-			this.Number = 0;
-			this.Candidates = FullCandidates();
-			this.Index = i;
-			this.IsPreset = false;
+			Number = 0;
+			Candidates = FullCandidates();
+			Index = i;
+			IsPreset = false;
 		}
 
 
@@ -23,7 +23,7 @@ namespace SudokuSolver.Sudoku
 
 		public bool IsPreset { get; set; }
 		
-		public Index Index { get; private set; }
+		public Index Index { get; }
 
 
 
@@ -41,7 +41,7 @@ namespace SudokuSolver.Sudoku
 
 		public override string ToString()
 		{
-			return (this.Number != 0 ? this.Number.ToString() : "");
+			return (Number != 0 ? Number.ToString() : "");
 		}
 
 		public static Cell Empty
@@ -58,7 +58,7 @@ namespace SudokuSolver.Sudoku
 		//Compare
 		public bool IsEqual(Cell c)
 		{
-			return (this.Number == c.Number && HaveSameCandidates(this, c) && this.IsPreset == c.IsPreset && this.Index.IsEqual(c.Index));
+			return (Number == c.Number && HaveSameCandidates(this, c) && IsPreset == c.IsPreset && Index.IsEqual(c.Index));
 		}
 
 		private static bool HaveSameCandidates(Cell c1, Cell c2)

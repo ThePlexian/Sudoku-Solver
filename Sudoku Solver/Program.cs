@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace SudokuSolver
 {
-	using SudokuSolver.UI;
+	using UI;
 
 	static class Program
 	{

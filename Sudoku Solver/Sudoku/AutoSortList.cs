@@ -8,7 +8,7 @@ namespace SudokuSolver.Sudoku
 		public new void Add(T item)
 		{
 			base.Add(item);
-			this.Sort();
+			Sort();
 		}
 	}
 }

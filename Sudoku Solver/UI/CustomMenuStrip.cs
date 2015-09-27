@@ -9,9 +9,9 @@ namespace SudokuSolver.UI
 		{
 			base.OnPaintBackground(e);	
 
-			e.Graphics.FillRectangle(new SolidBrush(this.BackColor), new Rectangle(0, 0, this.Width, this.Height));
-			var p = new Pen(Extensions.MixColors(this.BackColor, Color.Black, 0.8));
-			e.Graphics.DrawLine(p, 5, this.Height-1, this.Width-5, this.Height-1);
+			e.Graphics.FillRectangle(new SolidBrush(BackColor), new Rectangle(0, 0, Width, Height));
+			var p = new Pen(Extensions.MixColors(BackColor, Color.Black, 0.8));
+			e.Graphics.DrawLine(p, 5, Height-1, Width-5, Height-1);
 		}
 
 	}

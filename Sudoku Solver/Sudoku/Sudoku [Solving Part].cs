@@ -26,8 +26,8 @@ namespace SudokuSolver.Sudoku
 					break;
 			}
 
-			if (this.SolvingCompleted != null)
-				this.SolvingCompleted(this, EventArgs.Empty);
+			if (SolvingCompleted != null)
+				SolvingCompleted(this, EventArgs.Empty);
 
 			return success;
 		}
@@ -47,12 +47,12 @@ namespace SudokuSolver.Sudoku
 		private bool SolveBackTracking() //aka TrialAndError + Human
 		{
 			//Use human solving in the beginning
-			this.SolveHumanLike();
+			SolveHumanLike();
 
 
 			//Get missing numbers
-			var tmp = new Cell[this.Cells.Length];
-			for (var i = 0; i <= this.Cells.Length - 1; i++)
+			var tmp = new Cell[Cells.Length];
+			for (var i = 0; i <= Cells.Length - 1; i++)
 				tmp[i] = GetCell(i);
 			var missing = tmp.Where(c => c.Number == 0).ToList();
 
@@ -61,25 +61,25 @@ namespace SudokuSolver.Sudoku
 			if (missing.Count == 0)
 				return true;
 
-			if (missing.Count >= 81 - 17 || !this.IsValid)
+			if (missing.Count >= 81 - 17 || !IsValid)
 				return false;
 
 
 			//Try each candidate
 			foreach (var n in missing[0].Candidates)
 			{
-				var copy = (Sudoku)this.Clone();
+				var copy = (Sudoku)Clone();
 
 				//Set candidate
 				copy.SetValue(missing[0].Index, n);
-				if (this.CellChanged != null && RaiseCellChangedEvent)
-					this.CellChanged(this, new CellChangedEventArgs(copy.GetCell(missing[0].Index), CellChangedEventArgs.CellProperty.Number));
+				if (CellChanged != null && RaiseCellChangedEvent)
+					CellChanged(this, new CellChangedEventArgs(copy.GetCell(missing[0].Index), CellChangedEventArgs.CellProperty.Number));
 
 				//If solving wasn't successful
 				if (!copy.SolveBackTracking())
 					continue;
 
-				this.Override(copy);
+				Override(copy);
 				return true;
 			}
 
@@ -97,7 +97,7 @@ namespace SudokuSolver.Sudoku
 		private bool SolveHumanLike()
 		{
 			//Solve
-			while (this.MissingNumbers != 0)
+			while (MissingNumbers != 0)
 			{
 				var successful = false;
 
@@ -314,7 +314,7 @@ namespace SudokuSolver.Sudoku
 			var temp = new List<Cell>();
 
 			for (var c = 0; c <= 8; c++)
-				temp.Add(this.Cells[ind.Row, c]);
+				temp.Add(Cells[ind.Row, c]);
 
 			return temp;
 		}
@@ -324,7 +324,7 @@ namespace SudokuSolver.Sudoku
 			var temp = new List<Cell>();
 
 			for (var r = 0; r <= 8; r++)
-				temp.Add(this.Cells[r, ind.Column]);
+				temp.Add(Cells[r, ind.Column]);
 
 			return temp;
 		}
@@ -336,14 +336,14 @@ namespace SudokuSolver.Sudoku
 
 			for (var r = topleft.Row; r <= topleft.Row + 2; r++)
 				for (var c = topleft.Column; c <= topleft.Column + 2; c++)
-					temp.Add(this.Cells[r, c]);
+					temp.Add(Cells[r, c]);
 
 			return temp;
 		}
 
 		private List<Cell> GetConnectedCells(Index ind)
 		{
-			return GetCellsInRow(ind).Concat(GetCellsInColumn(ind)).Concat(GetCellsInBox(ind)).Where(c => !c.IsEqual(this.Cells[ind.Row, ind.Column])).ToList();
+			return GetCellsInRow(ind).Concat(GetCellsInColumn(ind)).Concat(GetCellsInBox(ind)).Where(c => !c.IsEqual(Cells[ind.Row, ind.Column])).ToList();
 		}
 
 
@@ -437,8 +437,8 @@ namespace SudokuSolver.Sudoku
 				return false;
 
 
-			if (this.CellChanged != null && RaiseCellChangedEvent)
-				this.CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
+			if (CellChanged != null && RaiseCellChangedEvent)
+				CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
 
 			return true;
 		}
@@ -454,8 +454,8 @@ namespace SudokuSolver.Sudoku
 		{
 			foreach (var c in GetConnectedCells(i))
 				if (c.Candidates.Remove(candidate))
-					if (this.CellChanged != null && RaiseCellChangedEvent)
-						this.CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
+					if (CellChanged != null && RaiseCellChangedEvent)
+						CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
 		}
 
 		//Activates the number in the candidates of the reachable Cells
@@ -467,8 +467,8 @@ namespace SudokuSolver.Sudoku
 			foreach (var c in GetConnectedCells(i).Where(c => c.Number == 0))
 			{
 				c.Candidates.Add(candidate);
-				if (this.CellChanged != null && RaiseCellChangedEvent)
-					this.CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
+				if (CellChanged != null && RaiseCellChangedEvent)
+					CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
 			}
 		}
 
@@ -478,7 +478,7 @@ namespace SudokuSolver.Sudoku
 			var candidates = new AutoSortList<int>();
 
 			//If the cell is filled, there is nothing ti refresh
-			if (this.Cells[i.Row, i.Column].Number != 0)
+			if (Cells[i.Row, i.Column].Number != 0)
 				return;
 
 			//Get all cells connected with this cell
@@ -489,7 +489,7 @@ namespace SudokuSolver.Sudoku
 				if (connectedcells.All(c => c.Number != n))
 					candidates.Add(n);
 
-			this.Cells[i.Row, i.Column].Candidates = candidates;
+			Cells[i.Row, i.Column].Candidates = candidates;
 		}
 
 		#endregion
@@ -504,7 +504,7 @@ namespace SudokuSolver.Sudoku
 			if (value == 0)
 				return;
 
-			this.SetValue(c.Index, value);
+			SetValue(c.Index, value);
 			successful = true;
 		}
 

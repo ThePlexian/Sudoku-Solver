@@ -33,7 +33,7 @@ namespace SudokuSolver.UI
 		//Dialog behaviour
 		private void btnReset_Click(object sender, EventArgs e)
 		{
-			this.tbName.Text = _sudoku.Name;
+			tbName.Text = _sudoku.Name;
 		}
 
 		private void btnApply_Click(object sender, EventArgs e)

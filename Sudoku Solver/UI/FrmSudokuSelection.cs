@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace SudokuSolver.UI
 {
-	using SudokuSolver.Sudoku;
+	using Sudoku;
 
 
 	public partial class FrmSudokuSelection : Form
@@ -16,18 +16,18 @@ namespace SudokuSolver.UI
 		public FrmSudokuSelection()
 		{
 			InitializeComponent();
-			this.Sudokus = new List<Sudoku>();
+			Sudokus = new List<Sudoku>();
 		}
 
 
 		//Startup
 		private void FrmSudokuSelection_Load(object sender, EventArgs e)
 		{
-			this.pbIcon.Image = SystemIcons.Information.ToBitmap();
-			this.pbIcon.SizeMode = PictureBoxSizeMode.CenterImage;
+			pbIcon.Image = SystemIcons.Information.ToBitmap();
+			pbIcon.SizeMode = PictureBoxSizeMode.CenterImage;
 
-			this.cbSudokus.DataSource = this.Sudokus;
-			this.cbSudokus.DisplayMember = "Name";
+			cbSudokus.DataSource = Sudokus;
+			cbSudokus.DisplayMember = "Name";
 		}
 
 
@@ -44,9 +44,9 @@ namespace SudokuSolver.UI
 		//Item changed
 		private void cbSudokus_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			this.SelectedSudoku = this.Sudokus[this.cbSudokus.SelectedIndex];
-			this.sfPreview.Sudoku = this.SelectedSudoku;
-			this.sfPreview.Invalidate();
+			SelectedSudoku = Sudokus[cbSudokus.SelectedIndex];
+			sfPreview.Sudoku = SelectedSudoku;
+			sfPreview.Invalidate();
 		}
 
 
@@ -54,12 +54,12 @@ namespace SudokuSolver.UI
 		//Dialogue
 		private void btnCancel_Click(object sender, EventArgs e)
 		{
-			this.DialogResult = DialogResult.Cancel;
+			DialogResult = DialogResult.Cancel;
 		}
 
 		private void btnSelect_Click(object sender, EventArgs e)
 		{
-			this.DialogResult = DialogResult.OK;
+			DialogResult = DialogResult.OK;
 		}
 
 

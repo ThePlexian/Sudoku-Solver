@@ -15,7 +15,7 @@ namespace SudokuSolver
 
 			//Borders wrong way
 			if (min > max)
-				Extensions.Swap(ref min, ref max);
+				Swap(ref min, ref max);
 
 			//Already in range
 			if (n >= min && n <= max)

@@ -6,8 +6,8 @@ namespace SudokuSolver.Sudoku
 	{
 		public CellChangedEventArgs(Cell c, CellProperty cp)
 		{
-			this.Cell = c;
-			this.ChangedProperty = cp;
+			Cell = c;
+			ChangedProperty = cp;
 		}
 
 		public Cell Cell { get; private set; }

@@ -5,8 +5,8 @@
 
 		public Index(int r, int c)
 		{
-			this.Row = r;
-			this.Column = c;
+			Row = r;
+			Column = c;
 		}
 
 		public readonly int Row;
@@ -15,12 +15,12 @@
 
 		public bool IsEqual(Index i)
 		{
-			return (this.Row == i.Row && this.Column == i.Column);
+			return (Row == i.Row && Column == i.Column);
 		}
 
 		public override string ToString()
 		{
-			return "{ " + this.Row + " | " + this.Column + " }";
+			return "{ " + Row + " | " + Column + " }";
 		}
 
 	}

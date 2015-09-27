@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace SudokuSolver.UI
 {
-	using SudokuSolver.Sudoku;
+	using Sudoku;
 	using System.Linq;
 
 	public partial class FrmMain : Form
@@ -39,31 +39,27 @@ namespace SudokuSolver.UI
 		{
 			//Sudoku
 			_sudoku = new Sudoku();
-			_sudoku.CellChanged += this.CellChanged;
-			_sudoku.SolvingCompleted += this.SudokuSolvingCompleted;
+			_sudoku.CellChanged += CellChanged;
+			_sudoku.SolvingCompleted += SudokuSolvingCompleted;
 			_solvingmethod = Sudoku.SolvingTechnique.HumanSolvingTechnique;
 
 			//Sudoku control
-			this.sudokuField1.Sudoku = _sudoku;
+			sudokuField1.Sudoku = _sudoku;
 
 			//The button
-			this.btnSolve.Location = new Point((this.ClientSize.Width - this.btnSolve.Width) / 2, this.btnSolve.Location.Y);
+			btnSolve.Location = new Point((ClientSize.Width - btnSolve.Width) / 2, btnSolve.Location.Y);
 
 			//Notifier
-			Notifier.Notifications.Notify += this.Notified;
+			Notifier.Notifications.Notify += Notified;
 			Notifier.Notifications.Reset();
-			_notirectangle = new Rectangle(10, this.customMenuStrip1.Location.Y + this.customMenuStrip1.Height + 10, this.ClientSize.Width - 20, 35);
+			_notirectangle = new Rectangle(10, customMenuStrip1.Location.Y + customMenuStrip1.Height + 10, ClientSize.Width - 20, 35);
 			_notiparam = string.Empty;
-
-			//Title
-			var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-			this.Text += "vers. " + v;
 		}
 
 		private void frmMain_Shown(object sender, EventArgs e)
 		{
 			Notifier.Notifications.ChangeState("Unambiguous", true);
-			this.sudokuField1.Focus();
+			sudokuField1.Focus();
 		}
 
 		private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -84,7 +80,7 @@ namespace SudokuSolver.UI
 		{
 			//Set the qualities
 			e.Graphics.CompositingQuality = CompositingQuality.HighQuality;
-			e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+			e.Graphics.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
 			e.Graphics.SmoothingMode = SmoothingMode.Default;
 			e.Graphics.InterpolationMode = InterpolationMode.HighQualityBilinear;
 			e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
@@ -113,7 +109,7 @@ namespace SudokuSolver.UI
 				}
 
 				e.Graphics.FillRectangle(b, _notirectangle);
-				e.Graphics.DrawString(n.Message.Replace("[0]", _notiparam.ToString().Replace(',', '.')), new Font(this.Font.FontFamily, 9.25F, FontStyle.Bold), Brushes.Black, _notirectangle, sf);
+				e.Graphics.DrawString(n.Message.Replace("[0]", _notiparam.ToString().Replace(',', '.')), new Font(Font.FontFamily, 9F, FontStyle.Bold), Brushes.Black, _notirectangle, sf);
 			}
 
 			e.Graphics.DrawRectangle(Pens.Black, _notirectangle.X + 1, _notirectangle.Y + 1, _notirectangle.Width - 1, _notirectangle.Height - 1);
@@ -133,7 +129,7 @@ namespace SudokuSolver.UI
 		//Notification started / expired
 		private void Notified(object sender, EventArgs e)
 		{
-			this.ConditionalInvoke(() => this.Invalidate(_notirectangle));
+			this.ConditionalInvoke(() => Invalidate(_notirectangle));
 		}
 
 		#endregion
@@ -149,9 +145,9 @@ namespace SudokuSolver.UI
 		private void btnSolve_Click(object sender, EventArgs e)
 		{
 			//Deactivate UI Control
-			this.customMenuStrip1.Enabled = false;
-			this.btnSolve.Enabled = false;
-			this.sudokuField1.EditingEnabled = false;
+			customMenuStrip1.Enabled = false;
+			btnSolve.Enabled = false;
+			sudokuField1.EditingEnabled = false;
 
 			//Start solving
 			_swsolving = Stopwatch.StartNew();
@@ -183,11 +179,11 @@ namespace SudokuSolver.UI
 			var cp = e.ChangedProperty;
 			if (!cp.HasFlag(CellChangedEventArgs.CellProperty.Number) &&
 			    !cp.HasFlag(CellChangedEventArgs.CellProperty.IsPreset) &&
-			    (!this.sudokuField1.ShowCandidates || !cp.HasFlag(CellChangedEventArgs.CellProperty.Candidates)))
+			    (!sudokuField1.ShowCandidates || !cp.HasFlag(CellChangedEventArgs.CellProperty.Candidates)))
 				return;
 
-			if (cp.HasFlag(CellChangedEventArgs.CellProperty.Number) && e.Cell.IsEqual(this._sudoku.GetCell(e.Cell.Index)))
-				this.sudokuField1.Invalidate(this.sudokuField1.GetRectangle(e.Cell));
+			if (cp.HasFlag(CellChangedEventArgs.CellProperty.Number) && e.Cell.IsEqual(_sudoku.GetCell(e.Cell.Index)))
+				sudokuField1.Invalidate(sudokuField1.GetRectangle(e.Cell));
 		}
 
 		//Sudoku solving procedure finished
@@ -210,10 +206,10 @@ namespace SudokuSolver.UI
 			//Reactivate UI Control
 			this.ConditionalInvoke(() =>
 								   {
-									   this.customMenuStrip1.Enabled = true;
-									   this.btnSolve.Enabled = true;
-									   this.sudokuField1.EditingEnabled = true;
-									   this.sudokuField1.Invalidate();
+									   customMenuStrip1.Enabled = true;
+									   btnSolve.Enabled = true;
+									   sudokuField1.EditingEnabled = true;
+									   sudokuField1.Invalidate();
 								   });
 		}
 
@@ -226,13 +222,13 @@ namespace SudokuSolver.UI
 		private void newToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			_sudoku = new Sudoku();
-			_sudoku.CellChanged += this.CellChanged;
-			_sudoku.SolvingCompleted += this.SudokuSolvingCompleted;
-			this.sudokuField1.Sudoku = _sudoku;
+			_sudoku.CellChanged += CellChanged;
+			_sudoku.SolvingCompleted += SudokuSolvingCompleted;
+			sudokuField1.Sudoku = _sudoku;
 
 			Notifier.Notifications.Reset();
 			Notifier.Notifications.ChangeState("Unambiguous", true);
-			this.Invalidate(_notirectangle);
+			Invalidate(_notirectangle);
 		}
 
 		private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -272,9 +268,9 @@ namespace SudokuSolver.UI
 
 					//Reset sudoku
 					_sudoku = new Sudoku();
-					_sudoku.CellChanged += this.CellChanged;
-					_sudoku.SolvingCompleted += this.SudokuSolvingCompleted;
-					this.sudokuField1.Sudoku = _sudoku;
+					_sudoku.CellChanged += CellChanged;
+					_sudoku.SolvingCompleted += SudokuSolvingCompleted;
+					sudokuField1.Sudoku = _sudoku;
 
 					return;
 				}
@@ -295,9 +291,9 @@ namespace SudokuSolver.UI
 					_sudoku.OverrideValues(sudokus[0]);
 
 				//Apply
-				this.sudokuField1.Sudoku = _sudoku;
-				this.sudokuField1.Invalidate();
-				this.CellChanged(this, CellChangedEventArgs.Empty);
+				sudokuField1.Sudoku = _sudoku;
+				sudokuField1.Invalidate();
+				CellChanged(this, CellChangedEventArgs.Empty);
 				_notiparam = _sudoku.Name;
 				Notifier.Notifications.ChangeState("Loaded", true);
 			}
@@ -364,8 +360,8 @@ namespace SudokuSolver.UI
 					return;
 
 
-				var sudokupic = new Bitmap(this.sudokuField1.Width, this.sudokuField1.Height);
-				this.sudokuField1.DrawToBitmap(sudokupic, new Rectangle(new Point(0, 0), this.sudokuField1.Size));
+				var sudokupic = new Bitmap(sudokuField1.Width, sudokuField1.Height);
+				sudokuField1.DrawToBitmap(sudokupic, new Rectangle(new Point(0, 0), sudokuField1.Size));
 
 				const int borderwidth = 5;
 				var result = new Bitmap(sudokupic.Width + 2 * borderwidth, sudokupic.Height + 2 * borderwidth);
@@ -435,8 +431,8 @@ namespace SudokuSolver.UI
 		private void deleteNonPresetToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			var temp = new Sudoku();
-			temp.CellChanged += this.CellChanged;
-			temp.SolvingCompleted += this.SudokuSolvingCompleted;
+			temp.CellChanged += CellChanged;
+			temp.SolvingCompleted += SudokuSolvingCompleted;
 
 			for (var i = 0; i < 81; i++)
 			{
@@ -449,8 +445,8 @@ namespace SudokuSolver.UI
 			}
 
 			_sudoku = temp;
-			this.sudokuField1.Sudoku = _sudoku;
-			this.sudokuField1.Invalidate();
+			sudokuField1.Sudoku = _sudoku;
+			sudokuField1.Invalidate();
 		}
 
 
@@ -461,8 +457,8 @@ namespace SudokuSolver.UI
 
 		private void showCandidatesToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			this.sudokuField1.ShowCandidates = ((ToolStripMenuItem)sender).Checked;
-			this.sudokuField1.Invalidate();
+			sudokuField1.ShowCandidates = ((ToolStripMenuItem)sender).Checked;
+			sudokuField1.Invalidate();
 		}
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)

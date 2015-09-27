@@ -8,3 +8,15 @@ C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver
 C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\bin\Release\Sudoku Solver.exe.config
 C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\SudokuSolver.UI.frmMain.resources
 C:\Users\Marek\Documents\Office\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\SudokuSolver.UI.FrmOverwritePrompt.resources
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\bin\Release\Sudoku Solver.exe.config
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\Sudoku Solver.exe
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\Sudoku Solver.pdb
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\bin\Release\Sudoku Solver.exe
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\bin\Release\Sudoku Solver.pdb
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\Sudoku Solver.csprojResolveAssemblyReference.cache
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\SudokuSolver.UI.FrmMain.resources
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\SudokuSolver.Properties.Resources.resources
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\SudokuSolver.UI.FrmOverwritePrompt.resources
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\SudokuSolver.UI.FrmSudokuName.resources
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\SudokuSolver.UI.FrmSudokuSelection.resources
+C:\Users\Plexian\OneDrive\Documents\Coding\[C#] Projects\Sudoku Solver\Sudoku Solver\obj\Release\Sudoku Solver.csproj.GenerateResource.Cache
