@@ -177,12 +177,12 @@ namespace SudokuSolver.UI
 				return;
 
 			var cp = e.ChangedProperty;
-			if (!cp.HasFlag(CellChangedEventArgs.CellProperty.Number) &&
-			    !cp.HasFlag(CellChangedEventArgs.CellProperty.IsPreset) &&
-			    (!sudokuField1.ShowCandidates || !cp.HasFlag(CellChangedEventArgs.CellProperty.Candidates)))
+			if (!cp.HasFlag(CellChangedEventArgs.CellProperty.Number) &&		/*no Number change*/
+			    !cp.HasFlag(CellChangedEventArgs.CellProperty.IsPreset) &&      /*no Preset change*/
+				(!sudokuField1.ShowCandidates || !cp.HasFlag(CellChangedEventArgs.CellProperty.Candidates)))	/*no candidate change or candidates not visible*/
 				return;
 
-			if (cp.HasFlag(CellChangedEventArgs.CellProperty.Number) && e.Cell.IsEqual(_sudoku.GetCell(e.Cell.Index)))
+			if (e.Cell.IsEqual(_sudoku.GetCell(e.Cell.Index)))
 				sudokuField1.Invalidate(sudokuField1.GetRectangle(e.Cell));
 		}
 

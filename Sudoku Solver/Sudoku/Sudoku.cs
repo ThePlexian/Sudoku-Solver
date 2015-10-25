@@ -315,36 +315,33 @@
 				doc.Load(path);
 
 				var xmlNodeList = doc.SelectNodes("Sudokus");
-				if (xmlNodeList != null)
-				{
-					var snodes = xmlNodeList[0].SelectNodes("Sudoku");
+				var snodes = xmlNodeList?[0].SelectNodes("Sudoku");
 
-					if (snodes != null)
-						foreach (XmlNode snode in snodes)
-						{
-							var xmlNode = snode.ChildNodes.Item(0);
-							if (xmlNode == null)
-								continue;
+				if (snodes != null)
+					foreach (XmlNode snode in snodes)
+					{
+						var xmlNode = snode.ChildNodes.Item(0);
+						if (xmlNode == null)
+							continue;
 
-							var s = new Sudoku { Name = xmlNode.InnerText };
+						var s = new Sudoku { Name = xmlNode.InnerText };
 
-							//Read children
-							var item1 = snode.ChildNodes.Item(1);
-							var item2 = snode.ChildNodes.Item(2);
-							if (item1 == null || item2 == null)
-								return LoadingProcessResult.InvalidFileContent;
+						//Read children
+						var item1 = snode.ChildNodes.Item(1);
+						var item2 = snode.ChildNodes.Item(2);
+						if (item1 == null || item2 == null)
+							return LoadingProcessResult.InvalidFileContent;
 
-							var cells = item1.InnerText;
-							var preset = item2.InnerText;
+						var cells = item1.InnerText;
+						var preset = item2.InnerText;
 
-							//Adjust cells
-							var validline = ReadLine(cells, ref s);
-							for (var i = 0; i <= 80; i++)
-								s.SetPresetValue(i, preset[i] == 'p');
+						//Adjust cells
+						var validline = ReadLine(cells, ref s);
+						for (var i = 0; i <= 80; i++)
+							s.SetPresetValue(i, preset[i] == 'p');
 
-							sudokus.Add(validline ? s : null);
-						}
-				}
+						sudokus.Add(validline ? s : null);
+					}
 			}
 			catch { return LoadingProcessResult.InvalidFileContent; }
 
