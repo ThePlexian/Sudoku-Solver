@@ -1,6 +1,7 @@
-﻿namespace SudokuSolver.UI
+﻿using SudokuSolver.Model.Data;
+
+namespace SudokuSolver.View
 {
-	using SudokuSolver.Sudoku;
 
 	partial class FrmMain
 	{
@@ -30,11 +31,11 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			SudokuSolver.Sudoku.Sudoku sudoku1 = new SudokuSolver.Sudoku.Sudoku();
+			SudokuSolver.Model.Data.Sudoku sudoku1 = new SudokuSolver.Model.Data.Sudoku();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
 			this.btnSolve = new System.Windows.Forms.Button();
-			this.sudokuField1 = new SudokuSolver.UI.SudokuField();
-			this.customMenuStrip1 = new SudokuSolver.UI.CustomMenuStrip();
+			this.sudokuField1 = new SudokuSolver.View.SudokuField();
+			this.customMenuStrip1 = new SudokuSolver.View.CustomMenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,7 +69,7 @@
 			this.btnSolve.TabIndex = 11;
 			this.btnSolve.Text = "Solve - Human Solving";
 			this.btnSolve.UseVisualStyleBackColor = true;
-			this.btnSolve.Click += new System.EventHandler(this.btnSolve_Click);
+			this.btnSolve.Click += new System.EventHandler(this.BtnSolve_Click);
 			// 
 			// sudokuField1
 			// 
@@ -126,14 +127,14 @@
 			this.newToolStripMenuItem.Name = "newToolStripMenuItem";
 			this.newToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
 			this.newToolStripMenuItem.Text = "New";
-			this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
+			this.newToolStripMenuItem.Click += new System.EventHandler(this.NewToolStripMenuItem_Click);
 			// 
 			// openToolStripMenuItem
 			// 
 			this.openToolStripMenuItem.Name = "openToolStripMenuItem";
 			this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
 			this.openToolStripMenuItem.Text = "Open";
-			this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+			this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
 			// 
 			// saveToolStripMenuItem
 			// 
@@ -150,21 +151,21 @@
 			this.saveAsTextfileToolStripMenuItem.Name = "saveAsTextfileToolStripMenuItem";
 			this.saveAsTextfileToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
 			this.saveAsTextfileToolStripMenuItem.Text = "Save As Textfile";
-			this.saveAsTextfileToolStripMenuItem.Click += new System.EventHandler(this.saveAsTextfileToolStripMenuItem_Click);
+			this.saveAsTextfileToolStripMenuItem.Click += new System.EventHandler(this.SaveAsTextfileToolStripMenuItem_Click);
 			// 
 			// saveAsBitmapToolStripMenuItem
 			// 
 			this.saveAsBitmapToolStripMenuItem.Name = "saveAsBitmapToolStripMenuItem";
 			this.saveAsBitmapToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
 			this.saveAsBitmapToolStripMenuItem.Text = "Save As Bitmap";
-			this.saveAsBitmapToolStripMenuItem.Click += new System.EventHandler(this.saveAsBitmapToolStripMenuItem_Click);
+			this.saveAsBitmapToolStripMenuItem.Click += new System.EventHandler(this.SaveAsBitmapToolStripMenuItem_Click);
 			// 
 			// saveAsXMLToolStripMenuItem
 			// 
 			this.saveAsXMLToolStripMenuItem.Name = "saveAsXMLToolStripMenuItem";
 			this.saveAsXMLToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
 			this.saveAsXMLToolStripMenuItem.Text = "Save As XML";
-			this.saveAsXMLToolStripMenuItem.Click += new System.EventHandler(this.saveAsXMLToolStripMenuItem_Click);
+			this.saveAsXMLToolStripMenuItem.Click += new System.EventHandler(this.SaveAsXMLToolStripMenuItem_Click);
 			// 
 			// toolStripSeparator1
 			// 
@@ -176,7 +177,7 @@
 			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
 			this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
 			this.exitToolStripMenuItem.Text = "Exit";
-			this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+			this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
 			// 
 			// editToolStripMenuItem
 			// 
@@ -191,7 +192,7 @@
 			this.deleteNonPresetToolStripMenuItem.Name = "deleteNonPresetToolStripMenuItem";
 			this.deleteNonPresetToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
 			this.deleteNonPresetToolStripMenuItem.Text = "Delete NonPreset";
-			this.deleteNonPresetToolStripMenuItem.Click += new System.EventHandler(this.deleteNonPresetToolStripMenuItem_Click);
+			this.deleteNonPresetToolStripMenuItem.Click += new System.EventHandler(this.DeleteNonPresetToolStripMenuItem_Click);
 			// 
 			// optionsToolStripMenuItem
 			// 
@@ -222,7 +223,7 @@
 			this.humanSolvingToolStripMenuItem.Name = "humanSolvingToolStripMenuItem";
 			this.humanSolvingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.humanSolvingToolStripMenuItem.Text = "Human Solving";
-			this.humanSolvingToolStripMenuItem.Click += new System.EventHandler(this.humanSolvingToolStripMenuItem_Click);
+			this.humanSolvingToolStripMenuItem.Click += new System.EventHandler(this.HumanSolvingToolStripMenuItem_Click);
 			// 
 			// backTrackingToolStripMenuItem
 			// 
@@ -230,7 +231,7 @@
 			this.backTrackingToolStripMenuItem.Name = "backTrackingToolStripMenuItem";
 			this.backTrackingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.backTrackingToolStripMenuItem.Text = "BackTracking";
-			this.backTrackingToolStripMenuItem.Click += new System.EventHandler(this.backTrackingToolStripMenuItem_Click);
+			this.backTrackingToolStripMenuItem.Click += new System.EventHandler(this.BackTrackingToolStripMenuItem_Click);
 			// 
 			// animatedSolvingToolStripMenuItem
 			// 
@@ -240,7 +241,7 @@
 			this.animatedSolvingToolStripMenuItem.Name = "animatedSolvingToolStripMenuItem";
 			this.animatedSolvingToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
 			this.animatedSolvingToolStripMenuItem.Text = "Animated Solving";
-			this.animatedSolvingToolStripMenuItem.Click += new System.EventHandler(this.animatedSolvingToolStripMenuItem_Click);
+			this.animatedSolvingToolStripMenuItem.Click += new System.EventHandler(this.AnimatedSolvingToolStripMenuItem_Click);
 			// 
 			// showCandidatesToolStripMenuItem
 			// 
@@ -248,7 +249,7 @@
 			this.showCandidatesToolStripMenuItem.Name = "showCandidatesToolStripMenuItem";
 			this.showCandidatesToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
 			this.showCandidatesToolStripMenuItem.Text = "Show Candidates";
-			this.showCandidatesToolStripMenuItem.Click += new System.EventHandler(this.showCandidatesToolStripMenuItem_Click);
+			this.showCandidatesToolStripMenuItem.Click += new System.EventHandler(this.ShowCandidatesToolStripMenuItem_Click);
 			// 
 			// changeColorsToolStripMenuItem
 			// 
@@ -285,7 +286,7 @@
 			this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
 			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
 			this.aboutToolStripMenuItem.Text = "About";
-			this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+			this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
 			// 
 			// FrmMain
 			// 
@@ -303,10 +304,10 @@
 			this.Name = "FrmMain";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Sudoku Solver - Plexian";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
-			this.Load += new System.EventHandler(this.frmMain_Load);
-			this.Shown += new System.EventHandler(this.frmMain_Shown);
-			this.Paint += new System.Windows.Forms.PaintEventHandler(this.frmMain_Paint);
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
+			this.Load += new System.EventHandler(this.FrmMain_Load);
+			this.Shown += new System.EventHandler(this.FrmMain_Shown);
+			this.Paint += new System.Windows.Forms.PaintEventHandler(this.FrmMain_Paint);
 			this.customMenuStrip1.ResumeLayout(false);
 			this.customMenuStrip1.PerformLayout();
 			this.ResumeLayout(false);

@@ -1,6 +1,6 @@
-﻿namespace SudokuSolver.UI
+﻿namespace SudokuSolver.View
 {
-	using SudokuSolver.Sudoku;
+	using SudokuSolver.View;
 
 	partial class FrmSudokuSelection
 	{
@@ -30,14 +30,14 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			SudokuSolver.Sudoku.Sudoku sudoku1 = new SudokuSolver.Sudoku.Sudoku();
+			SudokuSolver.Model.Data.Sudoku sudoku1 = new SudokuSolver.Model.Data.Sudoku();
 			this.lblInfo = new System.Windows.Forms.Label();
 			this.pbIcon = new System.Windows.Forms.PictureBox();
 			this.btnSelect = new System.Windows.Forms.Button();
 			this.btnCancel = new System.Windows.Forms.Button();
 			this.lblPreview = new System.Windows.Forms.Label();
 			this.cbSudokus = new System.Windows.Forms.ComboBox();
-			this.sfPreview = new SudokuSolver.UI.SudokuField();
+			this.sfPreview = new SudokuSolver.View.SudokuField();
 			((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -66,7 +66,7 @@
 			this.btnSelect.TabIndex = 4;
 			this.btnSelect.Text = "Select";
 			this.btnSelect.UseVisualStyleBackColor = true;
-			this.btnSelect.Click += new System.EventHandler(this.btnSelect_Click);
+			this.btnSelect.Click += new System.EventHandler(this.BtnSelect_Click);
 			// 
 			// btnCancel
 			// 
@@ -76,7 +76,7 @@
 			this.btnCancel.TabIndex = 5;
 			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
-			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+			this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
 			// 
 			// lblPreview
 			// 
@@ -95,7 +95,7 @@
 			this.cbSudokus.Name = "cbSudokus";
 			this.cbSudokus.Size = new System.Drawing.Size(189, 22);
 			this.cbSudokus.TabIndex = 8;
-			this.cbSudokus.SelectedIndexChanged += new System.EventHandler(this.cbSudokus_SelectedIndexChanged);
+			this.cbSudokus.SelectedIndexChanged += new System.EventHandler(this.CbSudokus_SelectedIndexChanged);
 			// 
 			// sfPreview
 			// 

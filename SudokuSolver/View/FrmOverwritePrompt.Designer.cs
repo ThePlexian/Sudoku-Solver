@@ -1,4 +1,4 @@
-﻿namespace SudokuSolver.UI
+﻿namespace SudokuSolver.View
 {
 	partial class FrmOverwritePrompt
 	{
@@ -44,7 +44,7 @@
 			this.btnOverwrite.TabIndex = 0;
 			this.btnOverwrite.Text = "Overwrite";
 			this.btnOverwrite.UseVisualStyleBackColor = true;
-			this.btnOverwrite.Click += new System.EventHandler(this.btnOverwrite_Click);
+			this.btnOverwrite.Click += new System.EventHandler(this.BtnOverwrite_Click);
 			// 
 			// btnAppend
 			// 
@@ -54,7 +54,7 @@
 			this.btnAppend.TabIndex = 1;
 			this.btnAppend.Text = "Append";
 			this.btnAppend.UseVisualStyleBackColor = true;
-			this.btnAppend.Click += new System.EventHandler(this.btnAppend_Click);
+			this.btnAppend.Click += new System.EventHandler(this.BtnAppend_Click);
 			// 
 			// btnCancel
 			// 
@@ -64,7 +64,7 @@
 			this.btnCancel.TabIndex = 2;
 			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
-			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+			this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
 			// 
 			// lblText
 			// 
@@ -99,7 +99,7 @@
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Confirm saving";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmOverwritePrompt_FormClosing);
-			this.Load += new System.EventHandler(this.frmSavePrompt_Load);
+			this.Load += new System.EventHandler(this.FrmSavePrompt_Load);
 			((System.ComponentModel.ISupportInitialize)(this.pbIcon)).EndInit();
 			this.ResumeLayout(false);
 

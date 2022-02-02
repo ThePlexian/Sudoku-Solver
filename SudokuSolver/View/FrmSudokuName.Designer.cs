@@ -1,4 +1,4 @@
-﻿namespace SudokuSolver.UI
+﻿namespace SudokuSolver.View
 {
 	partial class FrmSudokuName
 	{
@@ -41,7 +41,7 @@
 			this.tbName.Name = "tbName";
 			this.tbName.Size = new System.Drawing.Size(287, 22);
 			this.tbName.TabIndex = 0;
-			this.tbName.TextChanged += new System.EventHandler(this.tbName_TextChanged);
+			this.tbName.TextChanged += new System.EventHandler(this.TbName_TextChanged);
 			// 
 			// btnReset
 			// 
@@ -52,7 +52,7 @@
 			this.btnReset.TabIndex = 1;
 			this.btnReset.Text = "Reset";
 			this.btnReset.UseVisualStyleBackColor = true;
-			this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
+			this.btnReset.Click += new System.EventHandler(this.BtnReset_Click);
 			// 
 			// btnApply
 			// 
@@ -64,7 +64,7 @@
 			this.btnApply.TabIndex = 2;
 			this.btnApply.Text = "Apply";
 			this.btnApply.UseVisualStyleBackColor = true;
-			this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
+			this.btnApply.Click += new System.EventHandler(this.BtnApply_Click);
 			// 
 			// label1
 			// 
