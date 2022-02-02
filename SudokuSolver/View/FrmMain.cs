@@ -230,8 +230,7 @@ namespace SudokuSolver.View
             //Initialize OFD
             ofd.Title = "Open from file";
             ofd.CheckPathExists = true;
-            //ofd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            ofd.InitialDirectory = @"D:\OneDrive\Coding\SudokuSolver\inputs";
+            ofd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             ofd.Filter = "Sudoku files (*.txt;*xml)|*.txt;*xml|All files (*.*)|*.*";
 
             //Show

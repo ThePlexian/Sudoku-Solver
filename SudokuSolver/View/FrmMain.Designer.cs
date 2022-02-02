@@ -303,7 +303,7 @@ namespace SudokuSolver.View
 			this.MaximizeBox = false;
 			this.Name = "FrmMain";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Sudoku Solver - Plexian";
+			this.Text = "Sudoku Solver";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
 			this.Load += new System.EventHandler(this.FrmMain_Load);
 			this.Shown += new System.EventHandler(this.FrmMain_Shown);
