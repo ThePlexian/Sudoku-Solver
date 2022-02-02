@@ -31,31 +31,31 @@ namespace SudokuSolver.View
 
         //Dialogue behaviour
 
-        public Sudoku.FileAccess FileAccess { get; private set; }
+        public Model.IO.FileAccess FileAccess { get; private set; }
 
 
         private void BtnOverwrite_Click(object sender, EventArgs e)
         {
-            FileAccess = Sudoku.FileAccess.CreateOrOverwrite;
+            FileAccess = Model.IO.FileAccess.CreateOrOverwrite;
             Close();
         }
 
         private void BtnAppend_Click(object sender, EventArgs e)
         {
-            FileAccess = Sudoku.FileAccess.CreateOrAppend;
+            FileAccess = Model.IO.FileAccess.CreateOrAppend;
             Close();
         }
 
         private void BtnCancel_Click(object sender, EventArgs e)
         {
-            FileAccess = Sudoku.FileAccess.CreateOnly;
+            FileAccess = Model.IO.FileAccess.CreateOnly;
             Close();
         }
 
         private void FrmOverwritePrompt_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.FormOwnerClosing) {
-                FileAccess = Sudoku.FileAccess.CreateOnly;
+                FileAccess = Model.IO.FileAccess.CreateOnly;
             }
         }
 

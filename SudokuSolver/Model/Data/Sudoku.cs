@@ -2,7 +2,7 @@
 
 namespace SudokuSolver.Model.Data
 {
-    public partial class Sudoku : ICloneable
+    public class Sudoku : ICloneable
     {
 
         //Fields
@@ -14,7 +14,7 @@ namespace SudokuSolver.Model.Data
         //Constructors
         public Sudoku() : this(EmptyCellArray()) { }
 
-        private Sudoku(string name) : this(EmptyCellArray(), name) { }
+        public Sudoku(string name) : this(EmptyCellArray(), name) { }
 
         private Sudoku(Cell[,] cells) : this(cells, "Sudoku - " + DateTime.Now) { }
 
@@ -181,20 +181,16 @@ namespace SudokuSolver.Model.Data
             }
 
             temp.CellChanged += CellChanged;
-            temp.SolvingCompleted += SolvingCompleted;
-
             return temp;
         }
 
         //Override this sudoku with another
-        private void Override(Sudoku s)
+        public void Override(Sudoku s)
         {
             OverrideValues(s);
 
             CellChanged = null;
             CellChanged += s.CellChanged;
-            SolvingCompleted = null;
-            SolvingCompleted += s.SolvingCompleted;
         }
 
         //Override this sudoku, but only its values
@@ -224,255 +220,182 @@ namespace SudokuSolver.Model.Data
         }
 
 
+        
 
-        //Converts this sudoku to a string
-        public override string ToString()
+        #region ** Get certain cell clusters **
+
+        //Returns a cluster of cells
+        public List<Cell> GetCellsInRow(GridIndex ind)
         {
-            string? cells = "";
+            var temp = new List<Cell>();
 
-            if (!IsFilled) {
-                return Name + ": " + cells;
+            for (int c = 0; c <= 8; c++) {
+                temp.Add(Cells[ind.Row, c]);
             }
 
-            for (int i = 0; i < 81; i++) {
-                cells += GetCell(i).Number.ToString().Replace("0", ".");
+            return temp;
+        }
+
+        public List<Cell> GetCellsInColumn(GridIndex ind)
+        {
+            var temp = new List<Cell>();
+
+            for (int r = 0; r <= 8; r++) {
+                temp.Add(Cells[r, ind.Column]);
             }
 
-            return Name + ": " + cells;
+            return temp;
         }
 
-        private string CellsToString()
+        public List<Cell> GetCellsInBox(GridIndex ind)
         {
-            return string.Join("", GetCellsIterated()
-                                       .Select(c => c.Number == 0 ? "." : c.ToString()));
-        }
+            var temp = new List<Cell>();
+            var topleft = new GridIndex(ind.Row / 3 * 3, ind.Column / 3 * 3);
 
-
-
-
-        #region **** LOADING / SAVING ****
-
-        public enum FileAccess { CreateOnly, CreateOrOverwrite, CreateOrAppend }
-        public enum LoadingProcessResult { Success, InvalidFileContent }
-        public enum SavingProcessResult { Success, FileAlreadyExists, UnauthorizedAccess }
-
-        public static LoadingProcessResult LoadTxt(string path, out List<Sudoku> sudokus)
-        {
-            sudokus = new List<Sudoku>();
-
-
-            //Start reading
-            string[]? text = File.ReadAllLines(path);
-            int counter = 1;
-
-            foreach (string? line in text) {
-                //Read
-                var s = new Sudoku("Sudoku No. " + counter);
-                if (!ReadLine(line, ref s)) {
-                    return LoadingProcessResult.InvalidFileContent;
-                }
-
-                //Add if successful
-                sudokus.Add(s);
-                counter++;
-            }
-
-            return LoadingProcessResult.Success;
-        }
-
-        public static LoadingProcessResult LoadXml(string path, out List<Sudoku> sudokus)
-        {
-            sudokus = new List<Sudoku>();
-
-            //Start reading
-            try {
-                var doc = new XmlDocument();
-                doc.Load(path);
-
-                var xmlNodeList = doc.SelectNodes("Sudokus");
-                var snodes = xmlNodeList?[0].SelectNodes("Sudoku");
-
-                if (snodes != null) {
-                    foreach (XmlNode snode in snodes) {
-                        var xmlNode = snode.ChildNodes.Item(0);
-                        if (xmlNode == null) {
-                            continue;
-                        }
-
-                        var s = new Sudoku { Name = xmlNode.InnerText };
-
-                        //Read children
-                        var item1 = snode.ChildNodes.Item(1);
-                        var item2 = snode.ChildNodes.Item(2);
-                        if (item1 == null || item2 == null) {
-                            return LoadingProcessResult.InvalidFileContent;
-                        }
-
-                        string? cells = item1.InnerText;
-                        string? preset = item2.InnerText;
-
-                        //Adjust cells
-                        bool validline = ReadLine(cells, ref s);
-                        for (int i = 0; i <= 80; i++) {
-                            s.SetPresetValue(i, preset[i] == 'p');
-                        }
-
-                        sudokus.Add(validline ? s : null);
-                    }
+            for (int r = topleft.Row; r <= topleft.Row + 2; r++) {
+                for (int c = topleft.Column; c <= topleft.Column + 2; c++) {
+                    temp.Add(Cells[r, c]);
                 }
             }
-            catch { return LoadingProcessResult.InvalidFileContent; }
 
-            return LoadingProcessResult.Success;
+            return temp;
         }
 
-        private static bool ReadLine(string text, ref Sudoku sudoku)
+        public List<Cell> GetConnectedCells(GridIndex ind) => GetCellsInRow(ind).Concat(GetCellsInColumn(ind)).Concat(GetCellsInBox(ind)).Where(c => !c.IsEqual(Cells[ind.Row, ind.Column])).ToList();
+
+
+        //Returns a cluster of lists of cells
+        public IEnumerable<List<Cell>> GetListOfRows()
         {
-            //Preset
-            var oldsudoku = sudoku;
-            sudoku = new Sudoku(sudoku.Name);
+            var temp = new List<List<Cell>>();
+            for (int r = 0; r <= 8; r++) {
+                temp.Add(GetCellsInRow(new GridIndex(r, 0))); //column doesn't matter
+            }
 
-            text = text.Replace(".", "0");                  //Replace, cause both dots and zeros are valid
-            text = text.Replace(" ", "");                   //Replace, cause spaces are allowed as seperator, but are not necessary
-            text = text.Replace(Environment.NewLine, "");   //Linefeeds are allowed as seperator, but are not necessary
-            text = text.Replace("\n", "");                  //Linefeeds are allowed as seperator, but are not necessary
+            return temp;
+        }
 
-            //Length of text invalid
-            if (text.Length != 81) {
+        public IEnumerable<List<Cell>> GetListOfColumns()
+        {
+            var temp = new List<List<Cell>>();
+            for (int c = 0; c <= 8; c++) {
+                temp.Add(GetCellsInColumn(new GridIndex(0, c))); //row doesn't matter
+            }
+
+            return temp;
+        }
+
+        public IEnumerable<List<Cell>> GetListOfBoxes()
+        {
+            var temp = new List<List<Cell>>();
+            for (int r = 0; r <= 8; r += 3) {
+                for (int c = 0; c <= 8; c += 3) {
+                    temp.Add(GetCellsInBox(new GridIndex(r, c)));
+                }
+            }
+
+            return temp;
+        }
+
+        #endregion
+
+
+        #region ** Compare cell positions **
+
+
+
+        public static GridIndex ToBoxIndex(GridIndex i) => new(i.Row / 3 * 3, i.Column / 3 * 3);
+
+        #endregion
+
+
+        #region ** Update Candidates **
+
+        //Removes all the given candidates out of the given Cells
+        public bool RemoveCandidates(Cell c, params int[] candidates)
+        {
+            int countbefore = c.Candidates.Count;
+            candidates.ToList().ForEach(candidate => c.Candidates.Remove(candidate));
+
+            if (countbefore <= c.Candidates.Count) {
                 return false;
             }
 
-            //Try to set cells
-            int i = 0;
-            foreach (char c in text) {
-                //No number
-                if (!int.TryParse(c.ToString(), out int n)) {
-                    return false;
-                }
-
-                if (n != 0) {
-                    if (!sudoku.SetValue(i, n)) {
-                        return false;
-                    }
-                }
-
-                sudoku.SetPresetValue(i, n != 0);
-                i++;
+            if (CellChanged != null && RaiseCellChangedEvent) {
+                CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
             }
-
-
-            //Add eventhandlers afterwards
-            sudoku.CellChanged += oldsudoku.CellChanged;
-            sudoku.SolvingCompleted += oldsudoku.SolvingCompleted;
 
             return true;
         }
 
 
-        public SavingProcessResult SaveTxt(string path, FileAccess fa)
+
+        //Deletes the number out of the candidates of the reachable Cells
+        public void DeleteCandidate(int candidate, GridIndex i)
         {
-
-            //Do not overwrite
-            bool fileexists = File.Exists(path);
-            bool append = fa == FileAccess.CreateOrAppend;
-
-            if (fileexists && fa == FileAccess.CreateOnly) {
-                return SavingProcessResult.FileAlreadyExists;
-            }
-
-
-            //Saving
-            try {
-                using var sw = new StreamWriter(path, append);
-                if (append) {
-                    sw.WriteLine();
-                }
-
-                sw.Write(CellsToString());
-            }
-            catch { return SavingProcessResult.UnauthorizedAccess; }
-
-            return SavingProcessResult.Success;
-        }
-
-        public SavingProcessResult SaveXml(string path, FileAccess fa)
-        {
-
-            //Do not overwrite
-            bool fileexists = File.Exists(path);
-            bool append = fa == FileAccess.CreateOrAppend;
-
-            if (fileexists && fa == FileAccess.CreateOnly) {
-                return SavingProcessResult.FileAlreadyExists;
-            }
-
-
-            //Saving
-            try {
-                var doc = new XmlDocument();
-                XmlElement body = null;
-                if (!append || !fileexists) {
-                    //Create new header
-                    //Declaration
-                    var xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-                    var root = doc.DocumentElement;
-                    doc.InsertBefore(xmlDeclaration, root);
-
-                    //Body
-                    body = doc.CreateElement(string.Empty, "Sudokus", string.Empty);
-                    doc.AppendChild(body);
-                }
-                else {
-                    //Just load the existing one
-                    doc.Load(path);
-                    var xmlNodeList = doc.SelectNodes("Sudokus");
-                    if (xmlNodeList != null) {
-                        body = xmlNodeList[0] as XmlElement;
+            foreach (var c in GetConnectedCells(i)) {
+                if (c.Candidates.Remove(candidate)) {
+                    if (CellChanged != null && RaiseCellChangedEvent) {
+                        CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
                     }
                 }
-
-
-                //Sudoku
-                if (body != null) {
-                    body.AppendChild(CreateSudokuElement(doc));
-                }
-
-                doc.Save(path);
             }
-            catch { return SavingProcessResult.UnauthorizedAccess; }
-
-            return SavingProcessResult.Success;
         }
 
-        private XmlElement CreateSudokuElement(XmlDocument doc)
+        //Activates the number in the candidates of the reachable Cells
+        public void AddCandidate(int candidate, GridIndex i)
         {
-            //New sudoku
-            var parent = doc.CreateElement(string.Empty, "Sudoku", string.Empty);
-            var date = doc.CreateAttribute("Date");
-            date.Value = DateTime.Now.ToString();
+            if (candidate == 0) {
+                return;
+            }
 
-            //Name
-            var name = doc.CreateElement(string.Empty, "Name", string.Empty);
-            name.AppendChild(doc.CreateTextNode(Name));
+            foreach (var c in GetConnectedCells(i).Where(c => c.Number == 0)) {
+                c.Candidates.Add(candidate);
+                if (CellChanged != null && RaiseCellChangedEvent) {
+                    CellChanged(this, new CellChangedEventArgs(c, CellChangedEventArgs.CellProperty.Candidates));
+                }
+            }
+        }
 
-            //Cells
-            var cells = doc.CreateElement(string.Empty, "Cells", string.Empty);
-            cells.AppendChild(doc.CreateTextNode(CellsToString()));
+        //Refreshes the candidates in the Cell
+        public void RefreshCandidates(GridIndex i)
+        {
+            var candidates = new AutoSortList<int>();
 
-            //Preset
-            var presets = doc.CreateElement(string.Empty, "Preset", string.Empty);
-            presets.AppendChild(doc.CreateTextNode(string.Join("", GetCellsIterated().ToList().Select(c => c.IsPreset ? "p" : "."))));
+            //If the cell is filled, there is nothing ti refresh
+            if (Cells[i.Row, i.Column].Number != 0) {
+                return;
+            }
 
-            parent.SetAttributeNode(date);
-            parent.AppendChild(name);
-            parent.AppendChild(cells);
-            parent.AppendChild(presets);
+            //Get all cells connected with this cell
+            var connectedcells = GetConnectedCells(i);
 
-            return parent;
+            //Enumerate through the candidates, and add if none of the connected cells contains the candidate as number
+            for (int n = 1; n <= 9; n++) {
+                if (connectedcells.All(c => c.Number != n)) {
+                    candidates.Add(n);
+                }
+            }
+
+            Cells[i.Row, i.Column].Candidates = candidates;
         }
 
         #endregion
 
+
+
+
+
+        //Do what is neccessary when a new Cell number got found out
+        public void NewNumberCalculated(Cell c, int value, ref bool successful)
+        {
+            if (value == 0) {
+                return;
+            }
+
+            SetValue(c.Index, value);
+            successful = true;
+        }
 
         //Get raised whenever a Cell changed
         public event EventHandler<CellChangedEventArgs> CellChanged;

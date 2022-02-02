@@ -2,7 +2,9 @@
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using SudokuSolver.Model.Data;
+using SudokuSolver.Model.IO;
 using SudokuSolver.Model.Notifier;
+using SudokuSolver.Model.Solver;
 
 namespace SudokuSolver.View
 {
@@ -23,7 +25,7 @@ namespace SudokuSolver.View
         private Sudoku _sudoku;
 
         private Thread _solvingthread;
-        private Sudoku.SolvingTechnique _solvingmethod;
+        private SolvingFacade.SolvingTechnique _solvingmethod;
 
 
 
@@ -35,8 +37,7 @@ namespace SudokuSolver.View
             //Sudoku
             _sudoku = new Sudoku();
             _sudoku.CellChanged += CellChanged;
-            _sudoku.SolvingCompleted += SudokuSolvingCompleted;
-            _solvingmethod = Sudoku.SolvingTechnique.HumanSolvingTechnique;
+            _solvingmethod = SolvingFacade.SolvingTechnique.HumanSolvingTechnique;
 
             //Sudoku control
             sudokuField1.Sudoku = _sudoku;
@@ -143,8 +144,8 @@ namespace SudokuSolver.View
 
             //Start solving
             _swsolving = Stopwatch.StartNew();
-            _sudoku.SolvingCompleted += SudokuSolvingCompleted;
-            _solvingthread = new Thread(() => _sudoku.Solve(_solvingmethod));
+            SolvingFacade.SolvingCompleted += SudokuSolvingCompleted;
+            _solvingthread = new Thread(() => SolvingFacade.Solve(_sudoku, _solvingmethod));
             _solvingthread.Start();
         }
 
@@ -154,14 +155,14 @@ namespace SudokuSolver.View
         private void CellChanged(object sender, CellChangedEventArgs e)
         {
             //Update notifier
-            if (_swsolving == null || !_swsolving.IsRunning || _solvingmethod == Sudoku.SolvingTechnique.HumanSolvingTechnique) {
+            if (_swsolving == null || !_swsolving.IsRunning || _solvingmethod == SolvingFacade.SolvingTechnique.HumanSolvingTechnique) {
                 Notifications.ChangeState("Unambiguous", _sudoku.MissingNumbers > 81 - 17);
                 Notifications.ChangeState("Invalid", !_sudoku.IsValid);
             }
 
 
             //Update sudoku field
-            if (_solvingmethod != Sudoku.SolvingTechnique.HumanSolvingTechnique) {
+            if (_solvingmethod != SolvingFacade.SolvingTechnique.HumanSolvingTechnique) {
                 return;
             }
 
@@ -216,7 +217,6 @@ namespace SudokuSolver.View
         {
             _sudoku = new Sudoku();
             _sudoku.CellChanged += CellChanged;
-            _sudoku.SolvingCompleted += SudokuSolvingCompleted;
             sudokuField1.Sudoku = _sudoku;
 
             Notifications.Reset();
@@ -230,8 +230,9 @@ namespace SudokuSolver.View
             //Initialize OFD
             ofd.Title = "Open from file";
             ofd.CheckPathExists = true;
-            ofd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            ofd.Filter = "Text files (*.txt)|*.txt|XML files (*.xml)|*.xml|All files (*.*)|*.*";
+            //ofd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            ofd.InitialDirectory = @"D:\OneDrive\Coding\SudokuSolver\inputs";
+            ofd.Filter = "Sudoku files (*.txt;*xml)|*.txt;*xml|All files (*.*)|*.*";
 
             //Show
             if (ofd.ShowDialog(this) != DialogResult.OK) {
@@ -240,28 +241,27 @@ namespace SudokuSolver.View
 
             //Load
             var sudokus = new List<Sudoku>();
-            var result = default(Sudoku.LoadingProcessResult);
+            var result = default(Model.IO.LoadingProcessResult);
 
             switch (new FileInfo(ofd.FileName).Extension.ToLower()) {
                 case ".txt":
-                    result = Sudoku.LoadTxt(ofd.FileName, out sudokus);
+                    result = SudokuFileHandler.LoadTxt(ofd.FileName, out sudokus);
                     break;
                 case ".xml":
-                    result = Sudoku.LoadXml(ofd.FileName, out sudokus);
+                    result = SudokuFileHandler.LoadXml(ofd.FileName, out sudokus);
                     break;
             }
 
             //Loading not sucessful
-            if (result != Sudoku.LoadingProcessResult.Success) {
+            if (result != Model.IO.LoadingProcessResult.Success) {
                 //Add notification
-                if (result == Sudoku.LoadingProcessResult.InvalidFileContent) {
+                if (result == Model.IO.LoadingProcessResult.InvalidFileContent) {
                     Notifications.ChangeState("Invalid File Content", true);
                 }
 
                 //Reset sudoku
                 _sudoku = new Sudoku();
                 _sudoku.CellChanged += CellChanged;
-                _sudoku.SolvingCompleted += SudokuSolvingCompleted;
                 sudokuField1.Sudoku = _sudoku;
 
                 return;
@@ -307,7 +307,7 @@ namespace SudokuSolver.View
             }
 
             //Check for overwriting, or appending
-            var fa = default(Sudoku.FileAccess);
+            var fa = default(Model.IO.FileAccess);
 
             if (File.Exists(sfd.FileName)) {
                 using var fop = new FrmOverwritePrompt();
@@ -317,15 +317,15 @@ namespace SudokuSolver.View
             }
 
 
-            var res = _sudoku.SaveTxt(sfd.FileName, fa);
+            var res = SudokuFileHandler.SaveTxt(_sudoku, sfd.FileName, fa);
             switch (res) {
-                case Sudoku.SavingProcessResult.Success:
+                case Model.IO.SavingProcessResult.Success:
                     Notifications.ChangeState("Saved", true);
                     break;
-                case Sudoku.SavingProcessResult.FileAlreadyExists:
+                case Model.IO.SavingProcessResult.FileAlreadyExists:
                     Notifications.ChangeState("Saving Path Exists", true);
                     break;
-                case Sudoku.SavingProcessResult.UnauthorizedAccess:
+                case Model.IO.SavingProcessResult.UnauthorizedAccess:
                     Notifications.ChangeState("Unauthorized File Access", true);
                     break;
             }
@@ -377,7 +377,7 @@ namespace SudokuSolver.View
 
 
             //Check for overwriting or appending
-            var fa = default(Sudoku.FileAccess);
+            var fa = default(Model.IO.FileAccess);
 
             if (File.Exists(sfd.FileName)) {
                 using var fop = new FrmOverwritePrompt();
@@ -392,15 +392,15 @@ namespace SudokuSolver.View
                 fsn.ShowDialog();
             }
 
-            var res = _sudoku.SaveXml(sfd.FileName, fa);
+            var res = SudokuFileHandler.SaveXml(_sudoku, sfd.FileName, fa);
             switch (res) {
-                case Sudoku.SavingProcessResult.Success:
+                case Model.IO.SavingProcessResult.Success:
                     Notifications.ChangeState("Saved", true);
                     break;
-                case Sudoku.SavingProcessResult.FileAlreadyExists:
+                case Model.IO.SavingProcessResult.FileAlreadyExists:
                     Notifications.ChangeState("Saving Path Exists", true);
                     break;
-                case Sudoku.SavingProcessResult.UnauthorizedAccess:
+                case Model.IO.SavingProcessResult.UnauthorizedAccess:
                     Notifications.ChangeState("Unauthorized File Access", true);
                     break;
             }
@@ -411,7 +411,6 @@ namespace SudokuSolver.View
         {
             var temp = new Sudoku();
             temp.CellChanged += CellChanged;
-            temp.SolvingCompleted += SudokuSolvingCompleted;
 
             for (int i = 0; i < 81; i++) {
                 var c = _sudoku.GetCell(i);
@@ -446,7 +445,7 @@ namespace SudokuSolver.View
         private void HumanSolvingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UncheckOtherSolvingTechnique((ToolStripMenuItem)sender);
-            _solvingmethod = Sudoku.SolvingTechnique.HumanSolvingTechnique;
+            _solvingmethod = SolvingFacade.SolvingTechnique.HumanSolvingTechnique;
 
             btnSolve.Text = "Solve - Human Solving";
         }
@@ -454,7 +453,7 @@ namespace SudokuSolver.View
         private void BackTrackingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UncheckOtherSolvingTechnique((ToolStripMenuItem)sender);
-            _solvingmethod = Sudoku.SolvingTechnique.BackTracking;
+            _solvingmethod = SolvingFacade.SolvingTechnique.BackTracking;
 
             btnSolve.Text = "Solve - BackTracking";
         }
